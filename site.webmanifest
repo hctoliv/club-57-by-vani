@@ -1,0 +1,12 @@
+{
+  "name": "Club 57 by Vani",
+  "short_name": "Club 57",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b0907",
+  "theme_color": "#0b0907",
+  "icons": [
+    {"src": "img/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}
+  ]
+}

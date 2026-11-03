@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hctoliv.github.io/club-57-by-vani/sitemap.xml
