@@ -1,7 +1,7 @@
 @font-face{font-family:"Cormorant";src:url(fonts/cormorant-garamond-latin-500-normal.woff2) format("woff2");font-weight:500;font-display:swap}
 @font-face{font-family:"Cormorant";src:url(fonts/cormorant-garamond-latin-600-italic.woff2) format("woff2");font-weight:600;font-style:italic;font-display:swap}
-@font-face{font-family:"Num";src:url(fonts/playfair-display-latin-500-normal.woff2) format("woff2");font-weight:400 700;unicode-range:U+0030-0039;font-display:swap}
-@font-face{font-family:"Num";src:url(fonts/playfair-display-latin-500-italic.woff2) format("woff2");font-weight:400 700;font-style:italic;unicode-range:U+0030-0039;font-display:swap}
+@font-face{font-family:"Num";src:url(fonts/playfair-display-latin-500-normal-digits.woff2) format("woff2");font-weight:400 700;unicode-range:U+0030-0039;font-display:swap}
+@font-face{font-family:"Num";src:url(fonts/playfair-display-latin-500-italic-digits.woff2) format("woff2");font-weight:400 700;font-style:italic;unicode-range:U+0030-0039;font-display:swap}
 @font-face{font-family:"Jost";src:url(fonts/jost-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Jost";src:url(fonts/jost-latin-500-normal.woff2) format("woff2");font-weight:500;font-display:swap}
 
@@ -23,6 +23,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{background:var(--ink);color:var(--text);font:400 17px/1.6 var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+@supports (overflow:clip){html,body{overflow-x:clip}}
 body.is-locked{overflow:hidden}
 img{display:block;max-width:100%;height:auto}
 a{color:inherit}
@@ -86,8 +87,9 @@ ul,ol{list-style:none}
 .hero__scroll span{position:absolute;left:50%;top:9px;width:3px;height:8px;margin-left:-1.5px;border-radius:2px;background:var(--gold);animation:scrolly 1.8s ease-in-out infinite}
 .hero__logo{position:relative;width:min(360px,72vw);aspect-ratio:880/860;animation:rise 1.4s var(--ease) both}
 .hero__logo svg{display:block;width:100%;height:auto;filter:drop-shadow(0 0 40px rgba(226,190,120,.25))}
-.hero__shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(255,246,220,.55) 50%,transparent 60%);background-size:250% 100%;mask:url(img/logo-a.jpg) center/100% 100% no-repeat luminance;animation:shine 6s ease-in-out 1.2s infinite;opacity:0}
-@supports (mask-mode:luminance){.hero__shine{opacity:1}}
+.hero__shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(255,246,220,.55) 50%,transparent 60%);background-size:250% 100%;animation:shine 6s ease-in-out 1.2s infinite;opacity:0}
+.adult .hero__shine{mask:url(img/logo-a.webp) center/100% 100% no-repeat luminance}
+@supports (mask-mode:luminance){.adult .hero__shine{opacity:1}}
 .status{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:8px 16px;margin-bottom:22px;background:rgba(11,9,7,.5);animation:rise 1s var(--ease) both}
 .status__dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
 .status.is-open .status__dot{background:#7fd88f;box-shadow:0 0 0 0 rgba(127,216,143,.6);animation:pulse 2s infinite}
@@ -134,9 +136,11 @@ ul,ol{list-style:none}
 /* portal 57 */
 .portal{position:relative;height:240svh;background:var(--ink)}
 .portal__pin{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;place-items:center}
-.portal__photo{position:absolute;inset:0;background:url(img/lounge-telao.jpg) center/cover;opacity:0;filter:brightness(.55) saturate(.9)}
+.portal__photo{position:absolute;inset:0;background:center/cover;opacity:0;filter:brightness(.55) saturate(.9)}
 .portal__photo::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,var(--ink) 85%)}
-.portal__num{position:relative;font:500 min(78vw,120svh)/.8 var(--serif);letter-spacing:-.04em;background:url(img/lounge-telao.jpg) center/cover;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1px rgba(226,190,120,.45);will-change:transform;user-select:none}
+.portal__num{position:relative;font:500 min(78vw,120svh)/.8 var(--serif);letter-spacing:-.04em;background:center/cover;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1px rgba(226,190,120,.45);will-change:transform;user-select:none}
+.portal.is-near .portal__photo,.portal.is-near .portal__num{background-image:url(img/lounge-telao.webp)}
+html:not(.js) .portal__photo,html:not(.js) .portal__num{background-image:url(img/lounge-telao.webp)}
 .portal__cap{position:absolute;left:0;right:0;bottom:12svh;text-align:center;padding:0 var(--pad);opacity:0}
 .portal__line{font:500 clamp(32px,5.4vw,72px)/1.02 var(--serif)}
 .portal__line em{font-style:italic;font-weight:600;color:var(--gold-2)}
@@ -169,7 +173,7 @@ ul,ol{list-style:none}
 
 /* final */
 .final{position:relative;min-height:92svh;display:grid;place-items:center;text-align:center;overflow:hidden;padding:80px var(--pad);border-top:1px solid var(--line)}
-.final__media{position:absolute;inset:-10% 0;background:url(img/bg-jardim.jpg) center/cover;filter:brightness(.4) saturate(.9)}
+.final__media{position:absolute;inset:-10% 0;background:url(img/bg-jardim.webp) center/cover;filter:brightness(.4) saturate(.9)}
 .final__media::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(11,9,7,.25),var(--ink) 80%)}
 .final__in{position:relative;display:flex;flex-direction:column;align-items:center}
 .final__big{font:500 clamp(56px,11vw,160px)/.92 var(--serif);letter-spacing:-.02em}
@@ -271,6 +275,8 @@ ul,ol{list-style:none}
   .nav__links.is-open{opacity:1;pointer-events:auto}
   .nav__links a{font:500 34px/1 var(--serif);letter-spacing:0;text-transform:none;color:var(--text)}
   .nav__burger{display:block}
+  /* backdrop-filter vira bloco de contenção do menu fixo: com ele o menu abre espremido na barra */
+  .nav.is-solid{backdrop-filter:none;background:rgba(11,9,7,.95)}
   .nav__cta{display:none}
   .event,.bar,.horarios{grid-template-columns:1fr}
   .event__poster{max-width:440px;margin:0 auto}
@@ -333,6 +339,8 @@ html.lenis,html.lenis body{height:auto}
 .hero__smoke i:nth-child(3){left:10%;top:75%;animation-duration:30s;animation-delay:-18s}
 .hero__streak{position:absolute;z-index:-1;top:0;left:-40%;width:30%;height:140%;background:linear-gradient(90deg,transparent,rgba(255,230,170,.12),rgba(255,246,220,.28),rgba(255,230,170,.12),transparent);transform:rotate(18deg) translateY(-15%);animation:streak 9s cubic-bezier(.6,0,.3,1) 2s infinite;pointer-events:none}
 
+.hero.is-off *,.hero.is-off::before{animation-play-state:paused!important}
+
 /* intro */
 .intro{position:fixed;inset:0;z-index:92;display:grid;place-items:center;background:var(--ink);pointer-events:none}
 .intro[hidden]{display:none}
@@ -391,7 +399,7 @@ html.lenis,html.lenis body{height:auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes flicker{0%,100%{opacity:.85;transform:scale(1)}20%{opacity:1;transform:scale(1.04)}45%{opacity:.7;transform:scale(.97)}70%{opacity:.95;transform:scale(1.02)}}
 @keyframes smoke{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(18vw,-6vh) scale(1.3)}}
-@keyframes streak{0%{left:-40%}35%,100%{left:130%}}
+@keyframes streak{0%{translate:0 0}35%,100%{translate:567% 0}}
 @keyframes draw{to{stroke-dashoffset:0}}
 @keyframes logoIn{to{opacity:1;filter:none}}
 @keyframes sweep{to{background-position:-50% 0}}

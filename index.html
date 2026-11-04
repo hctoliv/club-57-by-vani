@@ -9,7 +9,7 @@
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#0b0907">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; script-src 'self'; frame-src https://www.google.com; connect-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; font-src 'self'; script-src 'self' 'sha256-WhVSYz6uFK7EdQRezQ5qaN3E5e9RXh95YK/JH1r/GWQ='; frame-src https://www.google.com; connect-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
 <meta name="geo.region" content="BR-SP">
 <meta name="geo.placename" content="Moema, São Paulo">
 
@@ -30,7 +30,8 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=9">
+<link rel="preload" href="fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css?v=11">
 
 <script type="application/ld+json">
 {
@@ -53,7 +54,7 @@
       "logo": "https://hctoliv.github.io/club-57-by-vani/img/icon-512.png",
       "image": [
         "https://hctoliv.github.io/club-57-by-vani/img/og.jpg",
-        "https://hctoliv.github.io/club-57-by-vani/img/recepcao.jpg",
+        "https://hctoliv.github.io/club-57-by-vani/img/recepcao.webp",
         "https://hctoliv.github.io/club-57-by-vani/img/jardim.jpg"
       ],
       "telephone": "+55-11-2386-4985",
@@ -102,7 +103,7 @@
       "endDate": "2026-11-07T03:00:00-03:00",
       "eventStatus": "https://schema.org/EventScheduled",
       "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-      "image": "https://hctoliv.github.io/club-57-by-vani/img/reinauguracao.jpg",
+      "image": "https://hctoliv.github.io/club-57-by-vani/img/reinauguracao.webp",
       "location": {"@id": "https://hctoliv.github.io/club-57-by-vani/#casa"},
       "organizer": {"@id": "https://hctoliv.github.io/club-57-by-vani/#casa"},
       "performer": [{"@type": "MusicGroup", "name": "Resenha dos Amigos"}]
@@ -121,14 +122,26 @@
   ]
 }
 </script>
-<script src="js/head.js"></script>
-<script src="main.js?v=7" defer></script>
+<script>// decide o portal 18+ antes do primeiro paint e pré-carrega só o logo que vai aparecer
+(() => {
+  const d = document, h = d.documentElement;
+  h.classList.add("js");
+  let adult = false;
+  try { adult = localStorage.getItem("c57-18") === "1"; } catch (e) {}
+  if (adult) h.classList.add("adult");
+  (adult ? ["img/logo-rgb.webp", "img/logo-a.webp"] : ["img/logo-mark.webp"]).forEach((href) => {
+    const l = d.createElement("link");
+    l.rel = "preload"; l.as = "image"; l.href = href; l.fetchPriority = "high";
+    d.head.append(l);
+  });
+})();</script>
+<script src="main.js?v=9" defer></script>
 </head>
 <body>
 
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
   <div class="gate__box">
-    <img src="img/logo-mark.png" alt="" width="240" height="234" class="gate__logo" fetchpriority="high">
+    <img src="img/logo-mark.webp" alt="" width="240" height="234" class="gate__logo" fetchpriority="high">
     <p class="gate__eyebrow">Conteúdo para maiores</p>
     <h2 id="gate-title" class="gate__title">Você tem 18 anos ou mais?</h2>
     <p class="gate__text">O Club 57 é uma casa exclusiva para adultos. Confirme pra continuar.</p>
@@ -142,7 +155,7 @@
 <div class="grain" aria-hidden="true"></div>
 <div class="intro" id="intro" aria-hidden="true" hidden>
   <svg class="intro__ring" viewBox="0 0 200 200"><circle cx="100" cy="100" r="94"/></svg>
-  <img class="intro__logo" src="img/logo-mark.png" alt="" width="240" height="234">
+  <img class="intro__logo" src="img/logo-mark.webp" alt="" width="240" height="234">
   <span class="intro__streak"></span>
 </div>
 <div class="cursor" id="cursor" aria-hidden="true"><i></i><span></span></div>
@@ -151,7 +164,7 @@
 
 <header class="nav" id="nav">
   <a class="nav__brand" href="#topo" aria-label="Club 57 by Vani, início">
-    <img src="img/logo-mark.png" alt="" width="40" height="39">
+    <img src="img/logo-nav.webp" alt="" width="40" height="39">
     <span>Club 57 <em>by Vani</em></span>
   </a>
   <nav aria-label="Principal">
@@ -171,10 +184,10 @@
 
 <section class="hero" id="topo" aria-labelledby="hero-title">
   <div class="hero__bg" aria-hidden="true">
-    <div class="hero__slide is-on" data-src="img/bg-jardim.jpg"></div>
-    <div class="hero__slide" data-src="img/bg-lounge.jpg"></div>
-    <div class="hero__slide" data-src="img/bg-telao.jpg"></div>
-    <div class="hero__slide" data-src="img/bg-recepcao.jpg"></div>
+    <div class="hero__slide is-on" data-src="img/bg-jardim.webp"></div>
+    <div class="hero__slide" data-src="img/bg-lounge.webp"></div>
+    <div class="hero__slide" data-src="img/bg-telao.webp"></div>
+    <div class="hero__slide" data-src="img/bg-recepcao.webp"></div>
   </div>
   <div class="hero__candles" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="hero__smoke" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -200,8 +213,8 @@
       </svg>
       <div class="hero__logo">
         <svg viewBox="0 0 720 704" role="img" aria-label="Logo Club 57 by Vani, The Massage House">
-          <defs><mask id="logo-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="704"><image href="img/logo-a.jpg" width="720" height="704"/></mask></defs>
-          <image href="img/logo-rgb.jpg" width="720" height="704" mask="url(#logo-mask)"/>
+          <defs><mask id="logo-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="704"><image data-href="img/logo-a.webp" width="720" height="704"/></mask></defs>
+          <image data-href="img/logo-rgb.webp" width="720" height="704" mask="url(#logo-mask)"/>
         </svg>
         <span class="hero__shine" aria-hidden="true"></span>
       </div>
@@ -246,7 +259,7 @@
 
 <section class="event" id="reinauguracao" aria-labelledby="event-title">
   <div class="event__poster">
-    <img src="img/reinauguracao.jpg" alt="Cartaz da festa de reinauguração do Club 57 by Vani, sexta 06/11 às 21h" width="800" height="1210" loading="lazy" decoding="async">
+    <img src="img/reinauguracao.webp" alt="Cartaz da festa de reinauguração do Club 57 by Vani, sexta 06/11 às 21h" width="800" height="1210" loading="lazy" decoding="async">
   </div>
   <div class="event__copy reveal">
     <p class="eyebrow">Já estamos funcionando</p>
@@ -331,19 +344,19 @@
         <h2 id="casa-title" class="h2">Uma casa pensada <em>em cada detalhe</em></h2>
         <p class="lead">Recepção discreta, salão climatizado, adega, lounge com telão e um jardim pra respirar entre um drink e outro.</p>
       </div>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da recepção"><img src="img/recepcao.jpg" alt="Recepção com poltronas de couro e piso de mármore" width="843" height="474" loading="lazy" decoding="async"></button><figcaption><span>01</span>Recepção</figcaption></figure>
-      <figure class="amb__card amb__card--tall"><button type="button" aria-label="Ampliar foto do whisky"><img src="img/whisky.jpg" alt="Whisky 12 anos e copo com gelo no balcão" width="960" height="812" loading="lazy" decoding="async"></button><figcaption><span>02</span>Bar</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto do lounge com telão"><img src="img/lounge-telao.jpg" alt="Lounge com poltronas e futebol no telão" width="843" height="474" loading="lazy" decoding="async"></button><figcaption><span>03</span>Lounge com telão</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da adega"><img src="img/lounge.jpg" alt="Adega, mesas redondas e plantas" width="843" height="474" loading="lazy" decoding="async"></button><figcaption><span>04</span>Adega</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto do jardim"><img src="img/jardim.jpg" alt="Jardim interno com árvores, bancos e luz baixa" width="843" height="474" loading="lazy" decoding="async"></button><figcaption><span>05</span>Jardim</figcaption></figure>
+      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da recepção"><img src="img/recepcao.webp" alt="Recepção com poltronas de couro e piso de mármore" width="843" height="474" loading="lazy" decoding="async"></button><figcaption><span>01</span>Recepção</figcaption></figure>
+      <figure class="amb__card amb__card--tall"><button type="button" aria-label="Ampliar foto do whisky"><img src="img/whisky.webp" alt="Whisky 12 anos e copo com gelo no balcão" width="960" height="812" loading="lazy" decoding="async"></button><figcaption><span>02</span>Bar</figcaption></figure>
+      <figure class="amb__card"><button type="button" aria-label="Ampliar foto do lounge com telão"><img src="img/lounge-telao.webp" alt="Lounge com poltronas e futebol no telão" width="843" height="474" loading="lazy" decoding="async"></button><figcaption><span>03</span>Lounge com telão</figcaption></figure>
+      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da adega"><img src="img/lounge.webp" alt="Adega, mesas redondas e plantas" width="843" height="474" loading="lazy" decoding="async"></button><figcaption><span>04</span>Adega</figcaption></figure>
+      <figure class="amb__card"><button type="button" aria-label="Ampliar foto do jardim"><img src="img/jardim.webp" alt="Jardim interno com árvores, bancos e luz baixa" width="843" height="474" loading="lazy" decoding="async"></button><figcaption><span>05</span>Jardim</figcaption></figure>
     </div>
   </div>
 </section>
 
 <section class="bar" id="bar" aria-labelledby="bar-title">
   <div class="bar__media">
-    <img src="img/whisky.jpg" alt="Garrafa de whisky 12 anos e copo com gelo no balcão" width="960" height="812" loading="lazy" decoding="async" class="bar__a">
-    <img src="img/cerveja.jpg" alt="Cervejas long neck geladas e taça no bar" width="960" height="757" loading="lazy" decoding="async" class="bar__b">
+    <img src="img/whisky.webp" alt="Garrafa de whisky 12 anos e copo com gelo no balcão" width="960" height="812" loading="lazy" decoding="async" class="bar__a">
+    <img src="img/cerveja.webp" alt="Cervejas long neck geladas e taça no bar" width="960" height="757" loading="lazy" decoding="async" class="bar__b">
   </div>
   <div class="bar__copy reveal">
     <p class="eyebrow">Bar &amp; Club</p>
@@ -458,7 +471,7 @@
 <footer class="foot" id="contato">
   <div class="foot__grid">
     <div class="foot__brand">
-      <img src="img/logo-mark.png" alt="Club 57 by Vani" width="240" height="234" loading="lazy" decoding="async">
+      <img src="img/logo-mark.webp" alt="Club 57 by Vani" width="240" height="234" loading="lazy" decoding="async">
       <p>Club 57 by Vani · The Massage House. Antigo Chanés 57 Bar &amp; Club e 57 House.</p>
     </div>
     <address class="foot__nap">

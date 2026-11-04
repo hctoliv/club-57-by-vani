@@ -12,7 +12,11 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     let hasGsap = false;
-    if (mobile()) $(".amb__pin").prepend($(".amb__intro"));
+    // ambientes: no celular o texto fica acima da galeria; acompanha giro de tela e resize
+    const ambMq = matchMedia("(max-width: 760px)"), ambIntro = $(".amb__intro");
+    const placeIntro = () => (ambMq.matches ? $(".amb__pin") : $("#gallery")).prepend(ambIntro);
+    placeIntro();
+    ambMq.addEventListener("change", () => { placeIntro(); if (hasGsap) ScrollTrigger.refresh(); });
 
     // rolagem suave
     let lenis = null;
@@ -31,14 +35,22 @@
     const goTo = (el) => (lenis ? lenis.scrollTo(el, { offset: -10, duration: 1.4 }) : el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }));
     $$('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
       const t = a.getAttribute("href").length > 1 && $(a.getAttribute("href"));
-      if (t) { e.preventDefault(); goTo(t); }
+      if (!t) return;
+      e.preventDefault();
+      // o menu aberto para o Lenis; ele precisa voltar antes de rolar
+      if (links.classList.contains("is-open")) setMenu(false);
+      goTo(t);
     }));
 
     // gate 18+: o conteúdo fica no HTML (o Google lê), só a tela fica coberta
     const gate = $("#gate");
     let ok = false;
     try { ok = localStorage.getItem("c57-18") === "1"; } catch (e) {}
+    // logo do hero (máscara SVG) só baixa quando o portal sai da frente
+    const showLogo = () => $$(".hero__logo image").forEach((i) => i.setAttribute("href", i.dataset.href));
     const unlock = () => {
+      document.documentElement.classList.add("adult");
+      showLogo();
       document.body.classList.remove("is-locked");
       smooth();
       const later = window.requestIdleCallback || ((f) => setTimeout(f, 300));
@@ -52,7 +64,7 @@
         setTimeout(() => (intro.hidden = true), 3500);
       }
     };
-    if (ok) gate.hidden = true;
+    if (ok) { gate.hidden = true; showLogo(); }
     else {
       document.body.classList.add("is-locked");
       $("#gate-yes").focus();
@@ -77,27 +89,43 @@
       if (lenis) open ? lenis.stop() : lenis.start();
     };
     burger.addEventListener("click", () => setMenu(burger.getAttribute("aria-expanded") !== "true"));
-    $$("a", links).forEach((a) => a.addEventListener("click", () => setMenu(false)));
+    addEventListener("keydown", (e) => { if (e.key === "Escape" && links.classList.contains("is-open")) { setMenu(false); burger.focus(); } });
 
     // hero: fotos entram depois do primeiro paint
     const slides = $$(".hero__slide");
     const loadSlide = (el) => { if (!el.dataset.on) { el.style.backgroundImage = `url(${el.dataset.src})`; el.dataset.on = 1; } };
     loadSlide(slides[0]);
     addEventListener("load", () => slides.forEach(loadSlide));
-    let cur = 0;
+    let cur = 0, heroOn = true;
+    const hero = $(".hero");
+    // fora da tela o hero para: sem troca de foto e sem animação CSS rodando à toa
+    new IntersectionObserver(([e]) => { heroOn = e.isIntersecting; hero.classList.toggle("is-off", !heroOn); }).observe(hero);
     if (!reduce) {
       setInterval(() => {
+        if (!heroOn || document.hidden) return;
         slides[cur].classList.remove("is-on");
         cur = (cur + 1) % slides.length;
         slides[cur].classList.add("is-on");
       }, 7000);
     }
-    const hero = $(".hero");
+    // brilho e inclinação seguem o mouse, no máximo uma vez por quadro
+    let px = 0, py = 0, pend = false;
+    const heroMove = [];
     hero.addEventListener("pointermove", (e) => {
-      const r = hero.getBoundingClientRect();
-      hero.style.setProperty("--gx", `${((e.clientX - r.left) / r.width) * 100}%`);
-      hero.style.setProperty("--gy", `${((e.clientY - r.top) / r.height) * 100}%`);
-    });
+      px = e.clientX; py = e.clientY;
+      if (pend) return;
+      pend = true;
+      requestAnimationFrame(() => {
+        pend = false;
+        const r = hero.getBoundingClientRect();
+        hero.style.setProperty("--gx", `${((px - r.left) / r.width) * 100}%`);
+        hero.style.setProperty("--gy", `${((py - r.top) / r.height) * 100}%`);
+        heroMove.forEach((f) => f(px, py));
+      });
+    }, { passive: true });
+
+    // foto do portal fica fora do carregamento inicial; entra junto com as animações
+    const portalPhoto = () => $(".portal").classList.add("is-near");
 
     // faíscas douradas subindo no hero (sprite pré-desenhado, 30 fps, só com o hero na tela)
     const sparks = () => {
@@ -201,9 +229,11 @@
     const form = $("#rform"), dayBox = $("#chips-d");
     const { d: today } = spNow();
     const opts = [];
+    const { m: nowM } = spNow();
     for (let i = 0; opts.length < 5 && i < 8; i++) {
       const d = (today + i) % 7;
       if (!HOURS[d]) continue;
+      if (i === 0 && nowM >= HOURS[d][1]) continue; // hoje já fechou (segunda depois das 23h)
       opts.push(i === 0 ? "hoje" : i === 1 ? "amanhã" : DAYS[d]);
     }
     dayBox.innerHTML = opts.map((o, i) => `<label><input type="radio" name="d" value="${o}"${i ? "" : " checked"}><span>${o[0].toUpperCase() + o.slice(1)}</span></label>`).join("");
@@ -260,10 +290,19 @@
     if (matchMedia("(pointer: fine)").matches && !reduce) {
       document.documentElement.classList.add("has-cursor");
       const cur = $("#cursor"), dot = $("i", cur), ring = $("span", cur);
-      let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
-      addEventListener("pointermove", (e) => { mx = e.clientX; my = e.clientY; dot.style.transform = `translate(${mx}px,${my}px)`; }, { passive: true });
-      const loop = () => { rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18; ring.style.transform = `translate(${rx}px,${ry}px)`; requestAnimationFrame(loop); };
-      loop();
+      let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my, running = false;
+      // o anel só anima enquanto ainda está alcançando o ponteiro
+      const loop = () => {
+        rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+        ring.style.transform = `translate(${rx}px,${ry}px)`;
+        if (Math.abs(mx - rx) + Math.abs(my - ry) > 0.3) requestAnimationFrame(loop);
+        else running = false;
+      };
+      addEventListener("pointermove", (e) => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.transform = `translate(${mx}px,${my}px)`;
+        if (!running) { running = true; requestAnimationFrame(loop); }
+      }, { passive: true });
       document.addEventListener("pointerover", (e) => cur.classList.toggle("is-hover", !!e.target.closest("a,button,label,summary")));
       $$("[data-magnet]").forEach((b) => {
         b.addEventListener("pointermove", (e) => {
@@ -273,9 +312,9 @@
         b.addEventListener("pointerleave", () => (b.style.transform = ""));
       });
       const logo = $(".hero__logo");
-      hero.addEventListener("pointermove", (e) => {
-        logo.style.setProperty("--ry", `${(e.clientX / innerWidth - 0.5) * 18}deg`);
-        logo.style.setProperty("--rx", `${(0.5 - e.clientY / innerHeight) * 14}deg`);
+      heroMove.push((x, y) => {
+        logo.style.setProperty("--ry", `${(x / innerWidth - 0.5) * 18}deg`);
+        logo.style.setProperty("--rx", `${(0.5 - y / innerHeight) * 14}deg`);
       });
       const poster = $(".event__poster");
       poster.addEventListener("pointermove", (e) => {
@@ -290,6 +329,7 @@
 
     // sem GSAP ou com movimento reduzido: tudo aparece de uma vez
     const still = () => {
+      portalPhoto();
       ws.forEach((w) => w.classList.add("on"));
       $$(".reveal").forEach((el) => el.classList.add("is-in"));
       $(".portal__photo").style.opacity = 1;
@@ -397,6 +437,7 @@
     const boot = () => {
       if (booted) return;
       booted = true;
+      portalPhoto();
       load("js/gsap.min.js")
         .then(() => Promise.all([load("js/ScrollTrigger.min.js"), load("js/lenis.min.js")]))
         .then(motion)
