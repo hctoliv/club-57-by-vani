@@ -21,7 +21,7 @@
   --ease:cubic-bezier(.2,.7,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%}
 body{background:var(--ink);color:var(--text);font:400 17px/1.6 var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 @supports (overflow:clip){html,body{overflow-x:clip}}
 body.is-locked{overflow:hidden}
@@ -159,7 +159,7 @@ html:not(.js) .portal__photo,html:not(.js) .portal__num{background-image:url(img
 
 /* ambientes */
 .amb{position:relative;background:linear-gradient(180deg,var(--ink),#120d08 40%,var(--ink))}
-.amb__pin{height:100svh;display:flex;align-items:center;overflow:hidden;padding-left:var(--pad)}
+.amb__pin{position:sticky;top:0;height:100svh;display:flex;align-items:center;overflow:hidden;padding-left:var(--pad)}
 .amb__track{display:flex;gap:clamp(14px,2vw,28px);align-items:center;padding-right:var(--pad);will-change:transform}
 .amb__intro{flex:0 0 min(440px,80vw);padding-right:4vw}
 .amb__intro .lead{max-width:34ch}
@@ -284,7 +284,7 @@ html:not(.js) .portal__photo,html:not(.js) .portal__num{background-image:url(img
   .hero__event{font-size:13px;gap:10px}
 }
 @media (max-width:760px){
-  .amb__pin{height:auto;display:block;padding:90px 0 70px}
+  .amb__pin{position:static;height:auto;display:block;padding:90px 0 70px}
   .amb__intro{padding:0 var(--pad) 30px}
   .amb__track{gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 var(--pad) 10px;scrollbar-width:none}
   .amb__card,.amb__card--tall{width:82vw;aspect-ratio:4/3;scroll-snap-align:center}
@@ -359,8 +359,8 @@ html.lenis,html.lenis body{height:auto}
 @media (pointer:fine){.has-cursor .cursor{display:block}.has-cursor,.has-cursor a,.has-cursor button{cursor:none}}
 
 /* rituais */
-.rituals{position:relative;margin:0 calc(var(--pad) * -1)}
-.rituals__pin{position:relative;height:100svh;min-height:560px;overflow:hidden;display:grid;place-items:center;border-block:1px solid var(--line)}
+.rituals{position:relative;margin:0 calc(var(--pad) * -1);height:420svh}
+.rituals__pin{position:sticky;top:0;height:100svh;min-height:560px;overflow:hidden;display:grid;place-items:center;border-block:1px solid var(--line)}
 .rituals__glow{position:absolute;inset:-20%;background:radial-gradient(circle at 50% 55%,var(--rg,rgba(226,170,90,.35)),transparent 55%);transition:background 1s}
 .rituals__nav{position:absolute;left:var(--pad);top:50%;translate:0 -50%;display:grid;gap:14px;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:rgba(194,179,148,.5)}
 .rituals__nav li{transition:color .4s,transform .4s var(--ease)}
@@ -379,7 +379,8 @@ html.lenis,html.lenis body{height:auto}
 .ritual__cta:hover{background:var(--gold);color:#1a1208;border-color:var(--gold)}
 .rituals__bar{position:absolute;left:var(--pad);right:var(--pad);bottom:40px;height:1px;background:var(--line)}
 .rituals__bar i{position:absolute;inset:0;background:var(--gold);transform-origin:left;transform:scaleX(.2)}
-.no-pin .rituals__pin{height:auto;min-height:0;padding:40px 0}
+.rituals.no-pin{height:auto}
+.no-pin .rituals__pin{position:relative;height:auto;min-height:0;padding:40px 0}
 .no-pin .ritual{opacity:1;visibility:visible;grid-area:auto;margin-bottom:60px}
 .no-pin .rituals__nav,.no-pin .rituals__count,.no-pin .rituals__bar{display:none}
 

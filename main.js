@@ -365,61 +365,70 @@
       });
       gsap.from(".manifesto__stats li", { y: 40, opacity: 0, stagger: 0.12, duration: 1, ease: "expo.out", scrollTrigger: { trigger: ".manifesto__stats", start: "top 88%" } });
 
-      // cartaz e cards
-      gsap.from(".event__poster img", { y: 90, rotate: -8, opacity: 0, duration: 1.4, ease: "expo.out", scrollTrigger: { trigger: ".event", start: "top 75%" } });
-      gsap.from(".bar__a", { clipPath: "inset(100% 0 0 0)", duration: 1.5, ease: "expo.inOut", scrollTrigger: { trigger: ".bar", start: "top 75%" } });
-      gsap.from(".bar__b", { clipPath: "inset(0 0 0 100%)", duration: 1.5, delay: 0.2, ease: "expo.inOut", scrollTrigger: { trigger: ".bar", start: "top 75%" } });
+      // cartaz e cards (clearProps devolve a inclinação do cartaz pro CSS)
+      gsap.from(".event__poster img", { y: 90, rotate: -8, opacity: 0, duration: 1.4, ease: "expo.out", clearProps: "transform,opacity", scrollTrigger: { trigger: ".event", start: "top 75%" } });
+      gsap.from(".bar__a", { clipPath: "inset(100% 0 0 0)", duration: 1.5, ease: "expo.inOut", clearProps: "clipPath", scrollTrigger: { trigger: ".bar", start: "top 75%" } });
+      gsap.from(".bar__b", { clipPath: "inset(0 0 0 100%)", duration: 1.5, delay: 0.2, ease: "expo.inOut", clearProps: "clipPath", scrollTrigger: { trigger: ".bar", start: "top 75%" } });
       gsap.to(".final__media", { yPercent: 12, ease: "none", scrollTrigger: { trigger: ".final", scrub: true } });
       gsap.from(".final__big", { scale: 0.85, opacity: 0, ease: "none", scrollTrigger: { trigger: ".final", start: "top 80%", end: "center center", scrub: true } });
 
-      // ambientes: rolagem horizontal presa na tela (desktop)
+      // ambientes: rolagem horizontal (desktop). A tela fica presa por CSS sticky, sem pin de JS:
+      // a seção ganha a altura do percurso e o trilho só anda conforme o progresso
       gsap.matchMedia().add("(min-width: 761px)", () => {
-        const track = $("#gallery");
-        const dist = () => track.scrollWidth - (innerWidth - track.getBoundingClientRect().left) + 40;
+        const amb = $(".amb"), pin = $(".amb__pin"), track = $("#gallery");
+        const dist = () => Math.max(0, track.scrollWidth - (innerWidth - parseFloat(getComputedStyle(pin).paddingLeft)) + 40);
+        const setH = () => { amb.style.height = `${dist() + innerHeight}px`; };
+        setH();
+        ScrollTrigger.addEventListener("refreshInit", setH);
         const tween = gsap.to(track, {
           x: () => -dist(), ease: "none",
-          scrollTrigger: { trigger: ".amb", pin: ".amb__pin", start: "top top", end: () => "+=" + dist(), scrub: 0.8, invalidateOnRefresh: true },
+          scrollTrigger: { trigger: amb, start: "top top", end: "bottom bottom", scrub: 0.5, invalidateOnRefresh: true },
         });
         $$(".amb__card img").forEach((img) => gsap.fromTo(img, { xPercent: -6 }, { xPercent: 6, ease: "none", scrollTrigger: { trigger: img.parentNode, containerAnimation: tween, start: "left right", end: "right left", scrub: true } }));
+        return () => { ScrollTrigger.removeEventListener("refreshInit", setH); amb.style.height = ""; };
       });
 
-      // rituais: um por vez, com a luz mudando de cor
+      // rituais: tela presa por CSS sticky e uma linha do tempo ligada à rolagem decide qual aparece.
+      // Como tudo é função da posição, subir a página desfaz exatamente o que a descida fez
       const rits = $$(".ritual"), navLi = $$(".rituals__nav li");
       const glows = ["rgba(226,170,90,.38)", "rgba(205,120,50,.38)", "rgba(160,40,70,.42)", "rgba(190,30,45,.45)", "rgba(240,205,130,.34)"];
-      const pinEl = $(".rituals__pin");
-      let ri = 0;
-      const show = (n) => {
+      const pinEl = $(".rituals__pin"), ritBar = $("#rit-bar"), ritN = $("#rit-n");
+      rits.forEach((r) => r.classList.add("is-on"));
+      gsap.set(rits, { autoAlpha: 0 });
+      gsap.set(rits[0], { autoAlpha: 1 });
+      const rt = gsap.timeline({ defaults: { ease: "power2.out" } });
+      rits.forEach((r, i) => {
+        if (i) rt.fromTo(r, { autoAlpha: 0, y: 70 }, { autoAlpha: 1, y: 0, duration: 0.3, immediateRender: false }, i);
+        if (i < rits.length - 1) rt.to(r, { autoAlpha: 0, y: -70, duration: 0.3, ease: "power2.in" }, i + 0.7);
+      });
+      rt.set({}, {}, rits.length);
+      let ri = -1;
+      const mark = (n) => {
         if (n === ri) return;
-        const dir = n > ri ? 1 : -1, next = rits[n];
-        rits.forEach((r, i) => {
-          gsap.killTweensOf([r, $(".ritual__name", r)]);
-          if (i !== n) gsap.to(r, { autoAlpha: 0, y: i === ri ? -70 * dir : 0, duration: i === ri ? 0.5 : 0.2, ease: "power3.in", onComplete: () => r.classList.remove("is-on") });
-        });
-        next.classList.add("is-on");
-        gsap.fromTo(next, { autoAlpha: 0, y: 70 * dir }, { autoAlpha: 1, y: 0, duration: 0.9, delay: 0.2, ease: "expo.out" });
-        gsap.fromTo($(".ritual__name", next), { letterSpacing: "0.08em", filter: "blur(10px)" }, { letterSpacing: "-0.03em", filter: "blur(0px)", duration: 1.2, delay: 0.25, ease: "expo.out" });
-        navLi.forEach((l, i) => l.classList.toggle("is-on", i === n));
-        $("#rit-n").textContent = String(n + 1).padStart(2, "0");
-        pinEl.style.setProperty("--rg", glows[n]);
         ri = n;
+        navLi.forEach((l, i) => l.classList.toggle("is-on", i === n));
+        ritN.textContent = String(n + 1).padStart(2, "0");
+        pinEl.style.setProperty("--rg", glows[n]);
       };
-      gsap.set(rits.slice(1), { autoAlpha: 0 });
+      mark(0);
       ScrollTrigger.create({
-        trigger: "#rituals", pin: ".rituals__pin", refreshPriority: 1, start: "top top", end: () => "+=" + innerHeight * 3.2, scrub: true,
+        trigger: "#rituals", start: "top top", end: "bottom bottom", animation: rt, scrub: 0.4,
         onUpdate: (st) => {
-          $("#rit-bar").style.transform = `scaleX(${0.2 + st.progress * 0.8})`;
-          show(Math.min(rits.length - 1, Math.floor(st.progress * rits.length)));
+          ritBar.style.transform = `scaleX(${0.2 + st.progress * 0.8})`;
+          mark(Math.min(rits.length - 1, Math.floor(st.progress * rits.length)));
         },
       });
 
-      // faixa gigante: corre sozinha e acelera com a rolagem
+      // faixa gigante: corre sozinha e acelera com a rolagem, depois volta ao normal
       const big = gsap.to("#big-track", { xPercent: -50, duration: 26, ease: "none", repeat: -1 });
+      let calm = 0;
       ScrollTrigger.create({
         trigger: ".big", start: "top bottom", end: "bottom top",
         onUpdate: (st) => {
-          const v = st.getVelocity() / 300;
-          gsap.to(big, { timeScale: (st.direction || 1) * Math.max(1, Math.min(6, Math.abs(v))), duration: 0.3, overwrite: true });
-          gsap.to(big, { timeScale: st.direction || 1, duration: 1.2, delay: 0.3 });
+          const v = Math.max(1, Math.min(5, Math.abs(st.getVelocity()) / 300));
+          gsap.to(big, { timeScale: v * (st.direction || 1), duration: 0.25, overwrite: true });
+          clearTimeout(calm);
+          calm = setTimeout(() => gsap.to(big, { timeScale: 1, duration: 1, overwrite: true }), 160);
         },
       });
 
