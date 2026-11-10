@@ -333,7 +333,7 @@ html.lenis,html.lenis body{height:auto}
 .hero__candles i:nth-child(1){width:38vmax;height:38vmax;left:-10vmax;bottom:-14vmax;background:radial-gradient(circle,rgba(255,150,60,.32),transparent 65%)}
 .hero__candles i:nth-child(2){width:30vmax;height:30vmax;right:-6vmax;top:-8vmax;background:radial-gradient(circle,rgba(226,170,90,.26),transparent 65%);animation-duration:4.1s;animation-delay:-1s}
 .hero__candles i:nth-child(3){width:22vmax;height:22vmax;right:22%;bottom:-10vmax;background:radial-gradient(circle,rgba(180,60,40,.28),transparent 65%);animation-duration:2.7s;animation-delay:-2s}
-.hero__candles,.hero__smoke{position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;overflow:hidden;contain:strict}
+.hero__candles,.hero__smoke{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden;contain:strict}
 .hero__smoke i{position:absolute;width:60vmax;height:22vmax;border-radius:50%;background:radial-gradient(ellipse,rgba(246,230,200,.07),transparent 70%);animation:smoke 26s ease-in-out infinite}
 .hero__smoke i:nth-child(1){left:-20%;top:55%}
 .hero__smoke i:nth-child(2){left:30%;top:20%;animation-duration:34s;animation-delay:-10s}
