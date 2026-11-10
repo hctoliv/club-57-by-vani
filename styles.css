@@ -21,7 +21,7 @@
   --ease:cubic-bezier(.2,.7,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
 body{background:var(--ink);color:var(--text);font:400 17px/1.6 var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 @supports (overflow:clip){html,body{overflow-x:clip}}
 body.is-locked{overflow:hidden}

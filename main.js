@@ -353,8 +353,10 @@
 
       // portal: entra pelo 57 até o salão
       const pt = gsap.timeline({ scrollTrigger: { trigger: ".portal", start: "top top", end: "bottom bottom", scrub: 0.6 } });
+      // escala máxima 9 (era 22): o 57 gigante virava uma camada de milhares de pixels que o
+      // celular descartava, e ao subir a página o número piscava ou aparecia como um bloco
       pt.fromTo(".portal__num", { scale: 0.7 }, { scale: 1, duration: 0.25, ease: "none" })
-        .to(".portal__num", { scale: 22, duration: 0.55, ease: "power2.in" })
+        .to(".portal__num", { scale: 9, duration: 0.55, ease: "power2.in" })
         .to(".portal__photo", { opacity: 1, duration: 0.25, ease: "none" }, "-=0.3")
         .to(".portal__num", { opacity: 0, duration: 0.1 }, "-=0.12")
         .to(".portal__cap", { opacity: 1, y: -10, duration: 0.2 });
