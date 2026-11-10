@@ -61,7 +61,7 @@ ul,ol{list-style:none}
 
 /* nav */
 .nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;align-items:center;gap:24px;padding:14px var(--pad);transition:background .4s,border-color .4s,padding .4s;border-bottom:1px solid transparent}
-.nav.is-solid{background:rgba(11,9,7,.86);backdrop-filter:blur(14px);border-color:var(--line);padding-block:10px}
+.nav.is-solid{background:rgba(11,9,7,.95);border-color:var(--line);padding-block:10px}
 .nav__brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:500 22px/1 var(--serif);margin-right:auto}
 .nav__brand img{width:40px;height:auto}
 .nav__brand em{font-style:italic;font-weight:600;color:var(--gold)}
@@ -291,6 +291,7 @@ html:not(.js) .portal__photo,html:not(.js) .portal__num{background-image:url(img
   .amb__card img{transform:none}
   .portal{height:180svh}
   .hero__scroll{display:none}
+  .grain{display:none}
 }
 @media (max-width:560px){
   body{font-size:16px}
@@ -328,7 +329,7 @@ html.lenis,html.lenis body{height:auto}
 .hero__ring text{font:500 15px var(--sans);letter-spacing:.32em;fill:var(--gold)}
 .hero__medal::before{content:"";position:absolute;inset:9%;border-radius:50%;border:1px solid var(--line);box-shadow:0 0 120px rgba(226,190,120,.18),inset 0 0 80px rgba(226,190,120,.08)}
 .hero__logo{position:relative;width:72%;aspect-ratio:720/704;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transform-style:preserve-3d;transition:transform .5s var(--ease);animation:none}
-.hero__candles i{position:absolute;border-radius:50%;mix-blend-mode:screen;animation:flicker 3.2s ease-in-out infinite}
+.hero__candles i{position:absolute;border-radius:50%;will-change:transform,opacity;animation:flicker 3.2s ease-in-out infinite}
 .hero__candles i:nth-child(1){width:38vmax;height:38vmax;left:-10vmax;bottom:-14vmax;background:radial-gradient(circle,rgba(255,150,60,.32),transparent 65%)}
 .hero__candles i:nth-child(2){width:30vmax;height:30vmax;right:-6vmax;top:-8vmax;background:radial-gradient(circle,rgba(226,170,90,.26),transparent 65%);animation-duration:4.1s;animation-delay:-1s}
 .hero__candles i:nth-child(3){width:22vmax;height:22vmax;right:22%;bottom:-10vmax;background:radial-gradient(circle,rgba(180,60,40,.28),transparent 65%);animation-duration:2.7s;animation-delay:-2s}
@@ -339,17 +340,17 @@ html.lenis,html.lenis body{height:auto}
 .hero__smoke i:nth-child(3){left:10%;top:75%;animation-duration:30s;animation-delay:-18s}
 .hero__streak{position:absolute;z-index:-1;top:0;left:-40%;width:30%;height:140%;background:linear-gradient(90deg,transparent,rgba(255,230,170,.12),rgba(255,246,220,.28),rgba(255,230,170,.12),transparent);transform:rotate(18deg) translateY(-15%);animation:streak 9s cubic-bezier(.6,0,.3,1) 2s infinite;pointer-events:none}
 
-.hero.is-off *,.hero.is-off::before{animation-play-state:paused!important}
+.is-off,.is-off *,.hero.is-off::before{animation-play-state:paused!important}
 
 /* intro */
 .intro{position:fixed;inset:0;z-index:92;display:grid;place-items:center;background:var(--ink);pointer-events:none}
 .intro[hidden]{display:none}
 .intro__ring{position:absolute;width:min(300px,64vw);height:auto;rotate:-90deg}
-.intro__ring circle{fill:none;stroke:var(--gold);stroke-width:1.2;stroke-dasharray:591;stroke-dashoffset:591;animation:draw 1.3s cubic-bezier(.7,0,.3,1) .1s forwards}
-.intro__logo{width:min(200px,44vw);opacity:0;filter:blur(8px);animation:logoIn 1s var(--ease) .9s forwards}
-.intro__streak{position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,240,200,.35) 50%,transparent 60%);background-size:300% 100%;background-position:150% 0;animation:sweep 1.1s ease-in-out 1.4s forwards}
-.intro.is-out{animation:introOut 1s cubic-bezier(.7,0,.2,1) forwards}
-.intro.is-out .intro__ring{animation:ringOut 1s cubic-bezier(.7,0,.2,1) forwards}
+.intro__ring circle{fill:none;stroke:var(--gold);stroke-width:1.2;stroke-dasharray:591;stroke-dashoffset:591;animation:draw .9s cubic-bezier(.7,0,.3,1) .05s forwards}
+.intro__logo{width:min(200px,44vw);opacity:0;filter:blur(8px);animation:logoIn .8s var(--ease) .5s forwards}
+.intro__streak{position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,240,200,.35) 50%,transparent 60%);background-size:300% 100%;background-position:150% 0;animation:sweep .8s ease-in-out .85s forwards}
+.intro.is-out{animation:introOut .8s cubic-bezier(.7,0,.2,1) forwards}
+.intro.is-out .intro__ring{animation:ringOut .8s cubic-bezier(.7,0,.2,1) forwards}
 
 /* cursor */
 .cursor{position:fixed;left:0;top:0;z-index:96;pointer-events:none;display:none}

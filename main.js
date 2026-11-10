@@ -21,16 +21,13 @@
     // rolagem suave
     let lenis = null;
     const smooth = () => {
-      if (reduce || lenis || typeof Lenis === "undefined" || location.search.includes("nosmooth")) return;
-      lenis = new Lenis({ lerp: 0.09 });
-      if (hasGsap) {
-        lenis.on("scroll", ScrollTrigger.update);
-        gsap.ticker.add((t) => lenis.raf(t * 1000));
-        gsap.ticker.lagSmoothing(0);
-      } else {
-        const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
-        requestAnimationFrame(raf);
-      }
+      // o Lenis só nasce junto com o GSAP: com um rAF próprio ele rolava fora de compasso
+      // com o ScrollTrigger e as cenas presas (portal, galeria, massagens) tremiam
+      if (reduce || lenis || !hasGsap || typeof Lenis === "undefined" || location.search.includes("nosmooth")) return;
+      lenis = new Lenis({ lerp: 0.1 });
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add((t) => lenis.raf(t * 1000));
+      gsap.ticker.lagSmoothing(0);
     };
     const goTo = (el) => (lenis ? lenis.scrollTo(el, { offset: -10, duration: 1.4 }) : el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }));
     $$('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
@@ -60,8 +57,8 @@
       const intro = $("#intro");
       if (!seen && !reduce) {
         intro.hidden = false;
-        setTimeout(() => intro.classList.add("is-out"), 2500);
-        setTimeout(() => (intro.hidden = true), 3500);
+        setTimeout(() => intro.classList.add("is-out"), 1600);
+        setTimeout(() => (intro.hidden = true), 2400);
       }
     };
     if (ok) { gate.hidden = true; showLogo(); }
@@ -123,6 +120,10 @@
         heroMove.forEach((f) => f(px, py));
       });
     }, { passive: true });
+
+    // efeitos em loop (texto dourado, faixas, pino do mapa) param quando a seção sai da tela
+    const offIo = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle("is-off", !e.isIntersecting)));
+    $$(".rituals__pin, .ticker, .map, .big").forEach((el) => offIo.observe(el));
 
     // foto do portal fica fora do carregamento inicial; entra junto com as animações
     const portalPhoto = () => $(".portal").classList.add("is-near");
@@ -424,6 +425,7 @@
       let calm = 0;
       ScrollTrigger.create({
         trigger: ".big", start: "top bottom", end: "bottom top",
+        onToggle: (st) => (st.isActive ? big.play() : big.pause()),
         onUpdate: (st) => {
           const v = Math.max(1, Math.min(5, Math.abs(st.getVelocity()) / 300));
           gsap.to(big, { timeScale: v * (st.direction || 1), duration: 0.25, overwrite: true });
@@ -435,7 +437,7 @@
       ScrollTrigger.refresh();
     };
 
-    // GSAP, ScrollTrigger e Lenis só chegam depois do primeiro paint
+    // GSAP, ScrollTrigger e Lenis chegam por scripts assíncronos
     if (reduce) return still();
     const load = (src) => new Promise((res, rej) => {
       const s = document.createElement("script");
@@ -452,9 +454,8 @@
         .then(motion)
         .catch(still);
     };
-    ["scroll", "pointerdown", "keydown", "touchstart"].forEach((ev) => addEventListener(ev, boot, { once: true, passive: true }));
-    const idle = window.requestIdleCallback ? (f) => requestIdleCallback(f, { timeout: 2500 }) : (f) => setTimeout(f, 1200);
-    if (document.readyState === "complete") idle(boot);
-    else addEventListener("load", () => idle(boot));
+    // carrega já (os scripts são assíncronos e não seguram o primeiro paint). Esperar o idle ou o
+    // primeiro toque fazia a galeria ganhar altura no meio da rolagem e a página dava um salto
+    boot();
   });
 })();
