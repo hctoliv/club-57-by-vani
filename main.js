@@ -125,6 +125,14 @@
     const offIo = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle("is-off", !e.isIntersecting)));
     $$(".rituals__pin, .ticker, .map, .big").forEach((el) => offIo.observe(el));
 
+    // galeria: as fotos depois da 5ª são lazy; quando a seção se aproxima, todas carregam
+    // de uma vez (no trilho horizontal o lazy nativo deixava foto aparecer em branco)
+    new IntersectionObserver(([e], io) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      $$(".amb__card img[loading=lazy]").forEach((i) => (i.loading = "eager"));
+    }, { rootMargin: "1200px 0px" }).observe($(".amb"));
+
     // foto do portal fica fora do carregamento inicial; entra junto com as animações
     const portalPhoto = () => $(".portal").classList.add("is-near");
 
