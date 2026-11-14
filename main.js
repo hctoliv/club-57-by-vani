@@ -265,6 +265,53 @@
       goTo($("#reserva"));
     }));
 
+    // trabalhe conosco: ficha vira mensagem no WhatsApp (nada é guardado)
+    const tform = $("#tform"), terr = $("#terr");
+    if (tform) {
+      const idade = (iso) => {
+        const [y, m, d] = iso.split("-").map(Number);
+        const n = new Date(), a = n.getFullYear() - y;
+        return n.getMonth() + 1 > m || (n.getMonth() + 1 === m && n.getDate() >= d) ? a : a - 1;
+      };
+      const erro = (txt, campo) => {
+        terr.textContent = txt; terr.hidden = false;
+        if (campo) { campo.setAttribute("aria-invalid", "true"); campo.focus(); }
+      };
+      tform.addEventListener("input", (e) => { e.target.removeAttribute("aria-invalid"); terr.hidden = true; });
+      tform.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const f = new FormData(tform), el = (n) => tform.elements[n];
+        const nome = (f.get("nome") || "").trim().replace(/\s+/g, " ");
+        const tel = (f.get("tel") || "").replace(/\D/g, "");
+        const cidade = (f.get("cidade") || "").trim();
+        const nasc = f.get("nasc") || "";
+        if (nome.split(" ").length < 2) return erro("Escreva seu nome completo, com sobrenome.", el("nome"));
+        if (!nasc) return erro("Informe sua data de nascimento.", el("nasc"));
+        const anos = idade(nasc);
+        if (!(anos >= 18 && anos < 100)) return erro("A vaga é só para maiores de 18 anos.", el("nasc"));
+        if (tel.length < 10 || tel.length > 13) return erro("Confira o número do WhatsApp, com DDD.", el("tel"));
+        if (!cidade) return erro("Informe sua cidade ou bairro.", el("cidade"));
+        if (!f.get("ok")) return erro("Confirme que tem 18 anos ou mais para enviar.", el("ok"));
+        const disp = f.getAll("disp");
+        const insta = (f.get("insta") || "").trim();
+        const sobre = (f.get("sobre") || "").trim();
+        const linhas = [
+          "Olá! Quero trabalhar no Club 57 como modelo.",
+          "",
+          `Nome completo: ${nome}`,
+          `Idade: ${anos} anos`,
+          `WhatsApp: ${f.get("tel").trim()}`,
+          `Cidade/bairro: ${cidade}`,
+          `Experiência: ${f.get("exp")}`,
+          `Disponibilidade: ${disp.length ? disp.join(", ") : "a combinar"}`,
+        ];
+        if (insta) linhas.push(`Instagram: ${insta}`);
+        if (sobre) linhas.push(`Sobre mim: ${sobre}`);
+        linhas.push("", "Vim pela página Trabalhe conosco do site.");
+        open(`https://wa.me/${WA}?text=${encodeURIComponent(linhas.join("\n"))}`, "_blank", "noopener");
+      });
+    }
+
     // mapa só carrega quando pedem
     $("#map-load").addEventListener("click", () => {
       const f = document.createElement("iframe");
