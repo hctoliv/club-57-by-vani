@@ -355,6 +355,41 @@ html:not(.js) .portal__photo,html:not(.js) .portal__num{background-image:url(img
   .tform__row{grid-template-columns:minmax(0,1fr)}
 }
 
+/* ===== seções claras (branco e creme), 2026-11 ===== */
+.light{
+  --ink:#ffffff;--ink-2:#faf5ec;--ink-3:#f1e9da;
+  --text:#1f1913;--muted:#5d5244;--line:rgba(150,112,48,.24);
+  --gold:#a77c35;--gold-2:#8a6224;--gold-3:#6f4e1b;
+  background:var(--ink);color:var(--text);color-scheme:light;
+}
+/* seções com largura máxima: fundo vai de ponta a ponta */
+.manifesto.light,.event.light,.bar.light,.horarios.light{box-shadow:0 0 0 100vmax var(--ink);clip-path:inset(0 -100vmax)}
+.horarios.light{--ink:#faf5ec}
+.light .h2 em,.light .final__big em{background:linear-gradient(100deg,#7a5520 0%,#a77c35 30%,#d4a85a 45%,#a77c35 60%,#7a5520 100%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
+.light .btn--gold{background:linear-gradient(135deg,#f6dfa4,#e2be78 45%,#a77c35);color:#1a1208;box-shadow:0 12px 30px -12px rgba(167,124,53,.6)}
+.light .btn--ghost{border-color:rgba(31,25,19,.25);color:var(--text)}
+.light .btn--ghost:hover{border-color:var(--gold);color:var(--gold)}
+.js .light .manifesto__text .w{color:#d3c7b3}
+.js .light .manifesto__text .w.on{color:var(--text)}
+.js .light .manifesto__text em .w.on{color:var(--gold)}
+.light .chips input:checked+span,.light .tform .chips input[type=checkbox]:checked+span{background:#e2be78;border-color:#e2be78;color:#1a1208}
+.light .chips span{color:var(--muted);border-color:rgba(31,25,19,.18)}
+.light .hours tr.is-today th::after{background:#e2be78}
+.light .rform__preview{background:#fff;color:var(--gold-2);box-shadow:0 10px 30px -18px rgba(120,90,40,.4)}
+.light .reserva__box,.light .tform{box-shadow:0 30px 80px -40px rgba(120,90,40,.35)}
+.light .field input,.light .field textarea{background:#fff;color:var(--text);border-color:rgba(31,25,19,.18)}
+.light .field input::placeholder,.light .field textarea::placeholder{color:#9a8f80}
+.light .field input[type=date]{color-scheme:light}
+.light .tform__err{color:#9b1c33;background:rgba(210,63,92,.08);border-color:rgba(210,63,92,.35)}
+.light .amb__card{border-color:transparent;box-shadow:0 24px 50px -28px rgba(60,40,10,.45)}
+.light .amb__card figcaption{color:#fff}
+.light .amb__card figcaption span{color:#f6dfa4}
+.light .event__poster img,.light .bar__media img{box-shadow:0 30px 60px -28px rgba(60,40,10,.55)}
+.light .map iframe{filter:none}
+.light .trab__glow{opacity:.55}
+.amb.light{background:radial-gradient(ellipse 60% 40% at 80% 20%,rgba(210,63,92,.06),transparent 70%),var(--ink-2)}
+.foot.light{background:var(--ink-2)}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
   .js .reveal{opacity:1;transform:none}
