@@ -89,7 +89,7 @@ ul,ol{list-style:none}
 .hero__logo{position:relative;width:min(360px,72vw);aspect-ratio:880/860;animation:rise 1.4s var(--ease) both}
 .hero__logo svg{display:block;width:100%;height:auto;filter:drop-shadow(0 0 40px rgba(226,190,120,.25))}
 .hero__shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(255,246,220,.55) 50%,transparent 60%);background-size:250% 100%;animation:shine 6s ease-in-out 1.2s infinite;opacity:0}
-.adult .hero__shine{mask:url(img/logo-a.webp) center/100% 100% no-repeat luminance}
+.adult .hero__shine{mask:url(img/logo-a.webp?v=2) center/100% 100% no-repeat luminance}
 @supports (mask-mode:luminance){.adult .hero__shine{opacity:1}}
 .status{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:8px 16px;margin-bottom:22px;background:rgba(24,18,13,.5);animation:rise 1s var(--ease) both}
 .status__dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
@@ -509,4 +509,22 @@ html.lenis,html.lenis body{height:auto}
 @media (max-width:560px){
   .hero{padding-top:90px}
   .hero__sub{font-size:15px}
+}
+
+/* conheça o espaço: só recepção e suíte, sem rolagem horizontal */
+.amb--duo{height:auto!important}
+.amb--duo .amb__pin{position:static;height:auto;display:block;padding:clamp(90px,11vw,150px) var(--pad)}
+.amb--duo .amb__track{display:grid;grid-template-columns:minmax(260px,.75fr) 1fr 1fr;gap:clamp(16px,2.2vw,32px);align-items:center;padding:0;transform:none!important;overflow:visible}
+.amb--duo .amb__intro{padding:0}
+.amb--duo .amb__card{width:auto;aspect-ratio:4/3}
+.amb--duo .amb__card img{transform:none}
+@media (max-width:1000px){
+  .amb--duo .amb__track{grid-template-columns:1fr 1fr}
+  .amb--duo .amb__intro{grid-column:1/-1}
+}
+@media (max-width:760px){
+  .amb--duo .amb__pin{padding:90px var(--pad) 70px}
+  .amb--duo .amb__intro{padding:0 0 30px}
+  .amb--duo .amb__track{grid-template-columns:1fr;gap:14px}
+  .amb--duo .amb__card{width:100%;aspect-ratio:4/3}
 }

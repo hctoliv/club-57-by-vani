@@ -31,7 +31,7 @@
 <link rel="preload" href="fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=17">
+<link rel="stylesheet" href="styles.css?v=18">
 
 <script type="application/ld+json">
 {
@@ -130,19 +130,19 @@
   let adult = false;
   try { adult = localStorage.getItem("c57-18") === "1"; } catch (e) {}
   if (adult) h.classList.add("adult");
-  (adult ? ["img/logo-rgb.webp", "img/logo-a.webp"] : ["img/logo-mark.webp"]).forEach((href) => {
+  (adult ? ["img/logo-rgb.webp?v=2", "img/logo-a.webp?v=2"] : ["img/logo-mark.webp?v=2"]).forEach((href) => {
     const l = d.createElement("link");
     l.rel = "preload"; l.as = "image"; l.href = href; l.fetchPriority = "high";
     d.head.append(l);
   });
 })();</script>
-<script src="main.js?v=15" defer></script>
+<script src="main.js?v=16" defer></script>
 </head>
 <body>
 
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
   <div class="gate__box">
-    <img src="img/logo-mark.webp" alt="" width="240" height="234" class="gate__logo" fetchpriority="high">
+    <img src="img/logo-mark.webp?v=2" alt="" width="240" height="234" class="gate__logo" fetchpriority="high">
     <p class="gate__eyebrow">Conteúdo para maiores</p>
     <h2 id="gate-title" class="gate__title">Você tem 18 anos ou mais?</h2>
     <p class="gate__text">O Club 57 é uma casa exclusiva para adultos. Confirme pra continuar.</p>
@@ -156,7 +156,7 @@
 <div class="grain" aria-hidden="true"></div>
 <div class="intro" id="intro" aria-hidden="true" hidden>
   <svg class="intro__ring" viewBox="0 0 200 200"><circle cx="100" cy="100" r="94"/></svg>
-  <img class="intro__logo" src="img/logo-mark.webp" alt="" width="240" height="234">
+  <img class="intro__logo" src="img/logo-mark.webp?v=2" alt="" width="240" height="234">
   <span class="intro__streak"></span>
 </div>
 <div class="cursor" id="cursor" aria-hidden="true"><i></i><span></span></div>
@@ -215,8 +215,8 @@
       </svg>
       <div class="hero__logo">
         <svg viewBox="0 0 720 704" role="img" aria-label="Logo Club 57 by Vani, The Massage House">
-          <defs><mask id="logo-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="704"><image data-href="img/logo-a.webp" width="720" height="704"/></mask></defs>
-          <image data-href="img/logo-rgb.webp" width="720" height="704" mask="url(#logo-mask)"/>
+          <defs><mask id="logo-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="704"><image data-href="img/logo-a.webp?v=2" width="720" height="704"/></mask></defs>
+          <image data-href="img/logo-rgb.webp?v=2" width="720" height="704" mask="url(#logo-mask)"/>
         </svg>
         <span class="hero__shine" aria-hidden="true"></span>
       </div>
@@ -338,29 +338,16 @@
   </ul>
 </section>
 
-<section class="amb light" id="casa" aria-labelledby="casa-title">
+<section class="amb amb--duo light" id="casa" aria-labelledby="casa-title">
   <div class="amb__pin">
     <div class="amb__track" id="gallery">
       <div class="amb__intro">
         <p class="eyebrow">Conheça o espaço</p>
-        <h2 id="casa-title" class="h2">Uma casa pensada <em>em cada detalhe</em></h2>
-        <p class="lead">Recepção discreta, bar completo, salão climatizado com palco e telão, sinuca, salas reservadas e suítes confortáveis. São 15 cantos pra conhecer.</p>
+        <h2 id="casa-title" class="h2">Da recepção <em>à suíte</em></h2>
+        <p class="lead">Uma recepção discreta pra você chegar à vontade e suítes confortáveis pra relaxar sem pressa.</p>
       </div>
-      <figure class="amb__card amb__card--tall"><button type="button" aria-label="Ampliar foto da fachada"><img src="img/casa-01.webp" alt="Letreiro dourado 57 House Club na fachada" width="640" height="800" decoding="async"></button><figcaption><span>01</span>Fachada</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da recepção"><img src="img/casa-02.webp" alt="Recepção com sofás de couro capitonê, TV e piso claro" width="1040" height="650" decoding="async"></button><figcaption><span>02</span>Recepção</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto do lounge"><img src="img/casa-03.webp" alt="Sofás pretos capitonê frente a frente com mesa redonda" width="1040" height="650" decoding="async"></button><figcaption><span>03</span>Lounge</figcaption></figure>
-      <figure class="amb__card amb__card--tall"><button type="button" aria-label="Ampliar foto do bar"><img src="img/casa-04.webp" alt="Prateleiras do bar repletas de whiskies e destilados" width="640" height="800" decoding="async"></button><figcaption><span>04</span>Bar</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto do balcão do bar"><img src="img/casa-05.webp" alt="Balcão do bar com banquetas e sofás capitonê" width="1040" height="650" decoding="async"></button><figcaption><span>05</span>Balcão</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto do salão"><img src="img/casa-06.webp" alt="Salão com poltronas vermelhas, mesas e luzes de LED" width="1040" height="650" loading="lazy" decoding="async"></button><figcaption><span>06</span>Salão</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto do palco e telão"><img src="img/casa-07.webp" alt="Palco com pole dance, caixa de som e telão no salão" width="1040" height="650" loading="lazy" decoding="async"></button><figcaption><span>07</span>Palco e telão</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto do salão climatizado"><img src="img/casa-08.webp" alt="Salão climatizado com poltronas vermelhas e portas de vidro" width="1040" height="650" loading="lazy" decoding="async"></button><figcaption><span>08</span>Salão climatizado</figcaption></figure>
-      <figure class="amb__card amb__card--tall"><button type="button" aria-label="Ampliar foto do corredor"><img src="img/casa-09.webp" alt="Corredor com mesas altas, banquetas e luminárias douradas" width="640" height="800" loading="lazy" decoding="async"></button><figcaption><span>09</span>Corredor</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da sinuca"><img src="img/casa-10.webp" alt="Mesa de sinuca com parede verde e luzes verticais" width="1040" height="650" loading="lazy" decoding="async"></button><figcaption><span>10</span>Sinuca</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da sinuca e lounge"><img src="img/casa-11.webp" alt="Mesas de sinuca ao fundo e poltronas vermelhas no lounge" width="1040" height="650" loading="lazy" decoding="async"></button><figcaption><span>11</span>Sinuca e lounge</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da sala vermelha"><img src="img/casa-12.webp" alt="Sala reservada com paredes vermelhas, sofá e luzes coloridas" width="1040" height="650" loading="lazy" decoding="async"></button><figcaption><span>12</span>Sala vermelha</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto do lounge reservado"><img src="img/casa-13.webp" alt="Lounge com sofá preto em U e mesa de centro" width="1040" height="650" loading="lazy" decoding="async"></button><figcaption><span>13</span>Lounge reservado</figcaption></figure>
-      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da suíte"><img src="img/casa-14.webp" alt="Suíte com cama de casal, enxoval branco e espelho" width="1040" height="650" loading="lazy" decoding="async"></button><figcaption><span>14</span>Suítes</figcaption></figure>
-      <figure class="amb__card amb__card--tall"><button type="button" aria-label="Ampliar foto do banheiro da suíte"><img src="img/casa-15.webp" alt="Banheiro da suíte com cuba de cobre e bancada de madeira" width="640" height="800" loading="lazy" decoding="async"></button><figcaption><span>15</span>Banheiro</figcaption></figure>
+      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da recepção"><img src="img/casa-02.webp" alt="Recepção com sofás de couro capitonê, TV e piso claro" width="1040" height="650" loading="lazy" decoding="async"></button><figcaption><span>01</span>Recepção</figcaption></figure>
+      <figure class="amb__card"><button type="button" aria-label="Ampliar foto da suíte"><img src="img/casa-14.webp" alt="Suíte com cama de casal, enxoval branco e espelho" width="1040" height="650" loading="lazy" decoding="async"></button><figcaption><span>02</span>Suíte</figcaption></figure>
     </div>
   </div>
 </section>
@@ -551,7 +538,7 @@
 <footer class="foot light" id="contato">
   <div class="foot__grid">
     <div class="foot__brand">
-      <img src="img/logo-mark.webp" alt="Club 57 by Vani" width="240" height="234" loading="lazy" decoding="async">
+      <img src="img/logo-mark.webp?v=2" alt="Club 57 by Vani" width="240" height="234" loading="lazy" decoding="async">
       <p>Club 57 by Vani · The Massage House. Antigo Chanés 57 Bar &amp; Club e 57 House.</p>
     </div>
     <address class="foot__nap">

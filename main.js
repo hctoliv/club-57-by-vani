@@ -434,6 +434,7 @@
       // a seção ganha a altura do percurso e o trilho só anda conforme o progresso
       gsap.matchMedia().add("(min-width: 761px)", () => {
         const amb = $(".amb"), pin = $(".amb__pin"), track = $("#gallery");
+        if (amb.classList.contains("amb--duo")) return;
         const dist = () => Math.max(0, track.scrollWidth - (innerWidth - parseFloat(getComputedStyle(pin).paddingLeft)) + 40);
         const setH = () => { amb.style.height = `${dist() + innerHeight}px`; };
         setH();
