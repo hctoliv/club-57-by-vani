@@ -528,3 +528,5 @@ html.lenis,html.lenis body{height:auto}
   .amb--duo .amb__track{grid-template-columns:1fr;gap:14px}
   .amb--duo .amb__card{width:100%;aspect-ratio:4/3}
 }
+.amb--duo .amb__card::after{content:"";position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(transparent,rgba(20,12,8,.72));pointer-events:none}
+.amb--duo .amb__card figcaption{z-index:1}
