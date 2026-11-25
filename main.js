@@ -3,7 +3,7 @@
   const EVENT_START = Date.parse("2026-11-06T21:00:00-03:00");
   const EVENT_END = Date.parse("2026-11-07T03:00:00-03:00");
   // [abre, fecha] em minutos desde 0h; fecha > 1440 atravessa a madrugada
-  const HOURS = { 0: null, 1: [720, 1380], 2: [720, 1620], 3: [720, 1620], 4: [720, 1620], 5: [720, 1620], 6: [720, 1560] };
+  const HOURS = { 0: null, 1: [720, 1020], 2: [720, 1020], 3: [720, 1020], 4: [720, 1020], 5: [720, 1020], 6: [720, 1020] };
   const DAYS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -208,6 +208,7 @@
 
     // reinauguração: some sozinha depois da festa
     const eventSec = $("#reinauguracao"), heroEvent = $("#hero-event");
+    if (eventSec && heroEvent) {
     const count = () => {
       const now = Date.now();
       if (now > EVENT_END) { eventSec.hidden = true; heroEvent.hidden = true; return false; }
@@ -218,6 +219,7 @@
       return true;
     };
     if (count()) setInterval(count, 1000);
+    }
 
     // manifesto palavra por palavra
     const words = $("#words");
@@ -291,6 +293,9 @@
         if (!(anos >= 18 && anos < 100)) return erro("A vaga é só para maiores de 18 anos.", el("nasc"));
         if (tel.length < 10 || tel.length > 13) return erro("Confira o número do WhatsApp, com DDD.", el("tel"));
         if (!cidade) return erro("Informe sua cidade ou bairro.", el("cidade"));
+        const foto = el("foto").files[0];
+        if (!foto) return erro("Escolha uma foto de corpo inteiro para enviar.", el("foto"));
+        if (!foto.type.startsWith("image/")) return erro("A foto precisa ser uma imagem (JPG ou PNG).", el("foto"));
         if (!f.get("ok")) return erro("Confirme que tem 18 anos ou mais para enviar.", el("ok"));
         const disp = f.getAll("disp");
         const insta = (f.get("insta") || "").trim();
@@ -307,8 +312,19 @@
         ];
         if (insta) linhas.push(`Instagram: ${insta}`);
         if (sobre) linhas.push(`Sobre mim: ${sobre}`);
-        linhas.push("", "Vim pela página Trabalhe conosco do site.");
-        open(`https://wa.me/${WA}?text=${encodeURIComponent(linhas.join("\n"))}`, "_blank", "noopener");
+        linhas.push("", "Vim pela página Trabalhe conosco · Modelos do site.");
+        const texto = linhas.join("\n");
+        const abrirWhats = (extra) => open(`https://wa.me/${WA}?text=${encodeURIComponent(texto + (extra || ""))}`, "_blank", "noopener");
+        const nota = $("#tnote");
+        if (navigator.canShare && navigator.canShare({ files: [foto] })) {
+          navigator.share({ files: [foto], text: texto }).catch(() => {
+            abrirWhats("\n\nVou enviar minha foto de corpo inteiro aqui na conversa.");
+          });
+          if (nota) nota.textContent = "Escolha o WhatsApp do Club 57 na lista para enviar a ficha com a foto.";
+        } else {
+          abrirWhats("\n\nVou enviar minha foto de corpo inteiro aqui na conversa.");
+          if (nota) nota.textContent = "Abrimos o WhatsApp com a sua ficha. Anexe a foto de corpo inteiro na conversa antes de enviar.";
+        }
       });
     }
 
@@ -373,14 +389,14 @@
         logo.style.setProperty("--rx", `${(0.5 - y / innerHeight) * 14}deg`);
       });
       const poster = $(".event__poster");
-      poster.addEventListener("pointermove", (e) => {
+      if (poster) poster.addEventListener("pointermove", (e) => {
         const r = poster.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
         poster.style.setProperty("--py", `${(x - 0.5) * 14}deg`);
         poster.style.setProperty("--px", `${(0.5 - y) * 10}deg`);
         poster.style.setProperty("--gx2", `${x * 100}%`);
         poster.style.setProperty("--gy2", `${y * 100}%`);
       });
-      poster.addEventListener("pointerleave", () => ["--px", "--py"].forEach((p) => poster.style.setProperty(p, "0deg")));
+      if (poster) poster.addEventListener("pointerleave", () => ["--px", "--py"].forEach((p) => poster.style.setProperty(p, "0deg")));
     }
 
     // sem GSAP ou com movimento reduzido: tudo aparece de uma vez

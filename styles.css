@@ -530,3 +530,34 @@ html.lenis,html.lenis body{height:auto}
 }
 .amb--duo .amb__card::after{content:"";position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(transparent,rgba(20,12,8,.72));pointer-events:none}
 .amb--duo .amb__card figcaption{z-index:1}
+
+/* Bar & Club: bilhar, camarote e DJ */
+.extras{padding:clamp(60px,9vw,120px) var(--pad);max-width:1320px;margin:0 auto}
+.extras.light{box-shadow:0 0 0 100vmax var(--ink);clip-path:inset(0 -100vmax)}
+.extras__grid{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:clamp(18px,2.4vw,32px);align-items:start}
+.xcard{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 24px 50px -28px rgba(60,40,10,.45);display:flex;flex-direction:column}
+.xcard__media{aspect-ratio:4/3;overflow:hidden}
+.xcard--feature .xcard__media{aspect-ratio:16/10}
+.xcard__media img{width:100%;height:100%;object-fit:cover;transition:transform 1s var(--ease)}
+.xcard:hover .xcard__media img{transform:scale(1.05)}
+.xcard__body{padding:24px 24px 28px;display:grid;gap:10px}
+.xcard__tag{font:500 12px/1 var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--gold-3)}
+.xcard h3{font:600 italic 28px/1.1 var(--serif);color:var(--text)}
+.xcard p{color:var(--muted)}
+.xcard__ticks{margin:6px 0 10px;gap:8px}
+.xcard__ticks li{color:var(--text);font-size:15px}
+.xcard .btn{justify-self:start}
+@media (max-width:980px){.extras__grid{grid-template-columns:1fr}}
+
+/* ficha: foto */
+.field--file input[type=file]{padding:12px;cursor:pointer}
+.field--file input[type=file]::file-selector-button{margin-right:12px;padding:8px 14px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--gold-2),var(--gold) 45%,var(--gold-3));color:#1a1208;font:500 14px var(--sans);cursor:pointer}
+.field__hint{font-size:13px;color:var(--muted)}
+.foot__credit{margin-top:10px;font-size:12px !important;opacity:.8}
+.foot__credit a{color:inherit}
+.xcard--feature{background:linear-gradient(160deg,#1f1810 0%,#18120d 100%);box-shadow:0 30px 60px -28px rgba(30,20,8,.7);align-self:stretch;justify-content:center}
+.xcard--feature .xcard__body{padding:clamp(28px,3vw,44px)}
+.xcard--feature .xcard__tag{color:#e2be78}
+.xcard--feature h3{color:#f3ead9;font-size:34px}
+.xcard--feature p{color:#d8ccb6}
+.xcard--feature .xcard__ticks li{color:#f3ead9}
