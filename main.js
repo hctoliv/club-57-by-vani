@@ -316,7 +316,7 @@
     $("#map-load").addEventListener("click", () => {
       const f = document.createElement("iframe");
       f.src = "https://www.google.com/maps?q=Alameda+dos+Aic%C3%A1s,+1293+-+Moema,+S%C3%A3o+Paulo+-+SP,+04086-003&output=embed";
-      f.title = "Mapa: Club 57 by Vani, Alameda dos Aicás, 1293, Moema";
+      f.title = "Mapa: Club 57, Alameda dos Aicás, 1293, Moema";
       f.loading = "lazy";
       f.referrerPolicy = "no-referrer-when-downgrade";
       $("#map").replaceChildren(f);
