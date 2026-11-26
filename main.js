@@ -3,7 +3,7 @@
   const EVENT_START = Date.parse("2026-11-06T21:00:00-03:00");
   const EVENT_END = Date.parse("2026-11-07T03:00:00-03:00");
   // [abre, fecha] em minutos desde 0h; fecha > 1440 atravessa a madrugada
-  const HOURS = { 0: null, 1: [720, 1020], 2: [720, 1020], 3: [720, 1020], 4: [720, 1020], 5: [720, 1020], 6: [720, 1020] };
+  const HOURS = { 0: null, 1: [720, 1740], 2: [720, 1740], 3: [720, 1740], 4: [720, 1740], 5: [720, 1740], 6: [720, 1740] };
   const DAYS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -244,7 +244,7 @@
     for (let i = 0; opts.length < 5 && i < 8; i++) {
       const d = (today + i) % 7;
       if (!HOURS[d]) continue;
-      if (i === 0 && nowM >= HOURS[d][1]) continue; // hoje já fechou (segunda depois das 23h)
+      if (i === 0 && nowM >= 1259) continue; // reservas só até 20h59
       opts.push(i === 0 ? "hoje" : i === 1 ? "amanhã" : DAYS[d]);
     }
     dayBox.innerHTML = opts.map((o, i) => `<label><input type="radio" name="d" value="${o}"${i ? "" : " checked"}><span>${o[0].toUpperCase() + o.slice(1)}</span></label>`).join("");
