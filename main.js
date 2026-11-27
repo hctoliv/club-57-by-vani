@@ -1,182 +1,151 @@
 (() => {
   const WA = "5511953803882";
-  const EVENT_START = Date.parse("2026-11-06T21:00:00-03:00");
-  const EVENT_END = Date.parse("2026-11-07T03:00:00-03:00");
   // [abre, fecha] em minutos desde 0h; fecha > 1440 atravessa a madrugada
   const HOURS = { 0: null, 1: [720, 1740], 2: [720, 1740], 3: [720, 1740], 4: [720, 1740], 5: [720, 1740], 6: [720, 1740] };
   const DAYS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+  const WORDS = ["CLUB 57", "RELAXE", "BRINDE", "DESLIGUE", "VIVA O 57"];
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const mobile = () => innerWidth <= 760;
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
   document.addEventListener("DOMContentLoaded", () => {
-    let hasGsap = false;
-    // ambientes: no celular o texto fica acima da galeria; acompanha giro de tela e resize
-    const ambMq = matchMedia("(max-width: 760px)"), ambIntro = $(".amb__intro");
-    const placeIntro = () => (ambMq.matches ? $(".amb__pin") : $("#gallery")).prepend(ambIntro);
-    placeIntro();
-    ambMq.addEventListener("change", () => { placeIntro(); if (hasGsap) ScrollTrigger.refresh(); });
+    const lock = (on) => document.body.classList.toggle("is-locked", on);
 
-    // rolagem suave
-    let lenis = null;
-    const smooth = () => {
-      // o Lenis só nasce junto com o GSAP: com um rAF próprio ele rolava fora de compasso
-      // com o ScrollTrigger e as cenas presas (portal, galeria, massagens) tremiam
-      if (reduce || lenis || !hasGsap || typeof Lenis === "undefined" || location.search.includes("nosmooth")) return;
-      lenis = new Lenis({ lerp: 0.1 });
-      lenis.on("scroll", ScrollTrigger.update);
-      gsap.ticker.add((t) => lenis.raf(t * 1000));
-      gsap.ticker.lagSmoothing(0);
-    };
-    const goTo = (el) => (lenis ? lenis.scrollTo(el, { offset: -10, duration: 1.4 }) : el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }));
-    $$('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
-      const t = a.getAttribute("href").length > 1 && $(a.getAttribute("href"));
-      if (!t) return;
-      e.preventDefault();
-      // o menu aberto para o Lenis; ele precisa voltar antes de rolar
-      if (links.classList.contains("is-open")) setMenu(false);
-      goTo(t);
-    }));
-
-    // gate 18+: o conteúdo fica no HTML (o Google lê), só a tela fica coberta
+    // ---------- gate 18+ (o conteúdo fica no HTML pro Google, só a tela fica coberta) ----------
     const gate = $("#gate");
     let ok = false;
     try { ok = localStorage.getItem("c57-18") === "1"; } catch (e) {}
-    // logo do hero (máscara SVG) só baixa quando o portal sai da frente
-    const showLogo = () => $$(".hero__logo image").forEach((i) => i.setAttribute("href", i.dataset.href));
-    const unlock = () => {
-      document.documentElement.classList.add("adult");
-      showLogo();
-      document.body.classList.remove("is-locked");
-      smooth();
-      const later = window.requestIdleCallback || ((f) => setTimeout(f, 300));
-      later(() => sparks());
-      let seen = false;
-      try { seen = sessionStorage.getItem("c57-intro") === "1"; sessionStorage.setItem("c57-intro", "1"); } catch (e) {}
-      const intro = $("#intro");
-      if (!seen && !reduce) {
-        intro.hidden = false;
-        setTimeout(() => intro.classList.add("is-out"), 1600);
-        setTimeout(() => (intro.hidden = true), 2400);
-      }
-    };
-    if (ok) { gate.hidden = true; showLogo(); }
-    else {
-      document.body.classList.add("is-locked");
-      $("#gate-yes").focus();
-    }
+    if (!ok) { lock(true); $("#gate-yes").focus(); }
     $("#gate-yes").addEventListener("click", () => {
       try { localStorage.setItem("c57-18", "1"); } catch (e) {}
-      gate.hidden = true;
-      unlock();
+      document.documentElement.classList.add("adult");
+      lock(false);
+      typer.start();
     });
 
-    // nav
-    const nav = $("#nav");
-    const onScroll = () => nav.classList.toggle("is-solid", scrollY > 40);
-    addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    const burger = $("#burger"), links = $("#nav-links");
+    // ---------- menu ----------
+    const nav = $("#nav"), menu = $("#menu"), menuBtn = $("#menu-btn");
     const setMenu = (open) => {
-      burger.setAttribute("aria-expanded", open);
-      burger.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
-      links.classList.toggle("is-open", open);
-      document.body.classList.toggle("is-locked", open);
-      if (lenis) open ? lenis.stop() : lenis.start();
+      nav.classList.toggle("is-open", open);
+      menu.inert = !open;
+      menuBtn.setAttribute("aria-expanded", open);
+      menuBtn.textContent = open ? "Fechar" : "Menu";
     };
-    burger.addEventListener("click", () => setMenu(burger.getAttribute("aria-expanded") !== "true"));
-    addEventListener("keydown", (e) => { if (e.key === "Escape" && links.classList.contains("is-open")) { setMenu(false); burger.focus(); } });
+    menuBtn.addEventListener("click", () => setMenu(!nav.classList.contains("is-open")));
+    addEventListener("keydown", (e) => { if (e.key === "Escape" && nav.classList.contains("is-open")) { setMenu(false); menuBtn.focus(); } });
+    document.addEventListener("click", (e) => { if (nav.classList.contains("is-open") && !nav.contains(e.target)) setMenu(false); });
+    $$("a", menu).forEach((a) => a.addEventListener("click", () => setMenu(false)));
 
-    // hero: fotos entram depois do primeiro paint
-    const slides = $$(".hero__slide");
-    const loadSlide = (el) => { if (!el.dataset.on) { el.style.backgroundImage = `url(${el.dataset.src})`; el.dataset.on = 1; } };
-    loadSlide(slides[0]);
-    addEventListener("load", () => slides.forEach(loadSlide));
-    let cur = 0, heroOn = true;
-    const hero = $(".hero");
-    // fora da tela o hero para: sem troca de foto e sem animação CSS rodando à toa
-    new IntersectionObserver(([e]) => { heroOn = e.isIntersecting; hero.classList.toggle("is-off", !heroOn); }).observe(hero);
-    if (!reduce) {
-      setInterval(() => {
-        if (!heroOn || document.hidden) return;
-        slides[cur].classList.remove("is-on");
-        cur = (cur + 1) % slides.length;
-        slides[cur].classList.add("is-on");
-      }, 7000);
-    }
-    // brilho e inclinação seguem o mouse, no máximo uma vez por quadro
-    let px = 0, py = 0, pend = false;
-    const heroMove = [];
-    hero.addEventListener("pointermove", (e) => {
-      px = e.clientX; py = e.clientY;
-      if (pend) return;
-      pend = true;
-      requestAnimationFrame(() => {
-        pend = false;
-        const r = hero.getBoundingClientRect();
-        hero.style.setProperty("--gx", `${((px - r.left) / r.width) * 100}%`);
-        hero.style.setProperty("--gy", `${((py - r.top) / r.height) * 100}%`);
-        heroMove.forEach((f) => f(px, py));
-      });
-    }, { passive: true });
-
-    // efeitos em loop (texto dourado, faixas, pino do mapa) param quando a seção sai da tela
-    const offIo = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle("is-off", !e.isIntersecting)));
-    $$(".rituals__pin, .ticker, .map, .big").forEach((el) => offIo.observe(el));
-
-    // galeria: as fotos depois da 5ª são lazy; quando a seção se aproxima, todas carregam
-    // de uma vez (no trilho horizontal o lazy nativo deixava foto aparecer em branco)
-    new IntersectionObserver(([e], io) => {
-      if (!e.isIntersecting) return;
-      io.disconnect();
-      $$(".amb__card img[loading=lazy]").forEach((i) => (i.loading = "eager"));
-    }, { rootMargin: "1200px 0px" }).observe($(".amb"));
-
-    // foto do portal fica fora do carregamento inicial; entra junto com as animações
-    const portalPhoto = () => $(".portal").classList.add("is-near");
-
-    // faíscas douradas subindo no hero (sprite pré-desenhado, 30 fps, só com o hero na tela)
-    const sparks = () => {
-      const cv = $("#sparks");
-      if (!cv || reduce) return;
-      const ctx = cv.getContext("2d");
-      const dot = document.createElement("canvas");
-      dot.width = dot.height = 24;
-      const dc = dot.getContext("2d"), g = dc.createRadialGradient(12, 12, 0, 12, 12, 12);
-      g.addColorStop(0, "rgba(255,244,214,1)");
-      g.addColorStop(0.25, "rgba(246,223,164,.8)");
-      g.addColorStop(1, "rgba(226,190,120,0)");
-      dc.fillStyle = g;
-      dc.fillRect(0, 0, 24, 24);
-      let w, h, parts, visible = true, last = 0;
-      const size = () => {
-        const dpr = Math.min(devicePixelRatio || 1, 1.5);
-        w = cv.clientWidth; h = cv.clientHeight;
-        cv.width = w * dpr; cv.height = h * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      };
-      const spawn = (y) => ({ x: Math.random() * w, y: y ?? h + 10, r: Math.random() * 7 + 3, v: Math.random() * 0.9 + 0.3, s: Math.random() * 6.28, a: Math.random() * 0.6 + 0.3 });
-      size();
-      parts = Array.from({ length: mobile() ? 26 : 50 }, () => spawn(Math.random() * h));
-      addEventListener("resize", size);
-      const tick = (t) => {
-        if (!visible) return;
-        requestAnimationFrame(tick);
-        if (t - last < 33) return;
-        last = t;
-        ctx.clearRect(0, 0, w, h);
-        for (const p of parts) {
-          p.y -= p.v; p.s += 0.04; p.x += Math.sin(p.s) * 0.5;
-          if (p.y < -10) Object.assign(p, spawn());
-          ctx.globalAlpha = p.a * Math.min(1, p.y / (h * 0.35));
-          ctx.drawImage(dot, p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+    // ---------- título digitado, palavra por palavra ----------
+    const typeEl = $("#type");
+    const typer = (() => {
+      let w = 0, i = WORDS[0].length, del = true, timer = 0, running = false, visible = true;
+      const step = () => {
+        if (!visible || document.hidden) { running = false; return; }
+        const word = WORDS[w];
+        let wait;
+        if (del) {
+          i--;
+          wait = 45;
+          if (i <= 0) { del = false; w = (w + 1) % WORDS.length; wait = 280; }
+        } else {
+          i++;
+          wait = 95;
+          if (i >= WORDS[w].length) { del = true; wait = w === 0 ? 2600 : 1500; }
         }
+        typeEl.textContent = WORDS[w].slice(0, Math.max(0, i)) || " ";
+        timer = setTimeout(step, wait);
       };
-      new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) requestAnimationFrame(tick); }).observe(hero);
-    };
+      const go = () => { if (running || reduce) return; running = true; timer = setTimeout(step, 2200); };
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible && document.documentElement.classList.contains("adult")) go(); }).observe($(".hero"));
+      document.addEventListener("visibilitychange", () => { if (!document.hidden && visible && document.documentElement.classList.contains("adult")) go(); });
+      return { start: go };
+    })();
+    if (ok) typer.start();
 
-    // aberto agora (horário de São Paulo)
+    // ---------- pilha de destaques ----------
+    const stack = $("#stack"), scards = $$(".scard", stack), sdots = $$("#stack-dots button");
+    let front = 0, stackOn = false, stackTimer = 0;
+    const paint = () => {
+      scards.forEach((c, k) => {
+        const pos = (k - front + scards.length) % scards.length;
+        c.className = `scard is-${pos}`;
+        c.inert = pos !== 0;
+      });
+      sdots.forEach((d, k) => d.setAttribute("aria-selected", k === front));
+    };
+    const go = (n) => { front = (n + scards.length) % scards.length; paint(); restart(); };
+    const restart = () => { clearInterval(stackTimer); if (stackOn && !reduce) stackTimer = setInterval(() => go(front + 1), 5200); };
+    sdots.forEach((d, k) => d.addEventListener("click", () => go(k)));
+    scards.forEach((c, k) => c.addEventListener("click", (e) => { if (!c.classList.contains("is-0")) { e.preventDefault(); go(k); } }));
+    let sx = null;
+    stack.addEventListener("pointerdown", (e) => (sx = e.clientX), { passive: true });
+    stack.addEventListener("pointerup", (e) => { if (sx !== null && Math.abs(e.clientX - sx) > 40) go(front + (e.clientX < sx ? 1 : -1)); sx = null; }, { passive: true });
+    new IntersectionObserver(([e]) => { stackOn = e.isIntersecting; restart(); }, { threshold: 0.3 }).observe(stack);
+    paint();
+
+    // ---------- efeitos ligados à rolagem (função da posição, nunca tween disparado) ----------
+    const fills = $$(".mega.fill");
+    let ticking = false;
+    const onScroll = () => {
+      ticking = false;
+      nav.classList.toggle("is-solid", scrollY > 60);
+      if (reduce) return;
+      const vh = innerHeight;
+      const r = stack.getBoundingClientRect();
+      stack.style.setProperty("--s", (0.86 + 0.14 * clamp((vh - r.top) / (vh * 0.7))).toFixed(4));
+      fills.forEach((h) => {
+        const t = h.getBoundingClientRect().top;
+        h.style.setProperty("--p", clamp((vh * 0.92 - t) / (vh * 0.45)).toFixed(3));
+      });
+    };
+    addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+    addEventListener("resize", onScroll);
+    onScroll();
+
+    // ---------- entrada suave ----------
+    const rvs = $$(".sec__lead, .rail, .perks, .about__txt, .panel, .duo, .faq, .foot__panel");
+    rvs.forEach((el) => el.classList.add("rv"));
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+    rvs.forEach((el) => io.observe(el));
+
+    // ---------- carrosséis ----------
+    $$("[data-rail]").forEach((rail) => {
+      const track = $(".rail__track", rail), items = [...track.children], dots = $(".dots", rail);
+      const [prev, next] = $$(".arrow", rail);
+      dots.innerHTML = items.map(() => "<i></i>").join("");
+      const dl = [...dots.children];
+      const stepW = () => items[0].getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 14);
+      const update = () => {
+        const max = track.scrollWidth - track.clientWidth;
+        const n = Math.round(track.scrollLeft / stepW());
+        const cur = track.scrollLeft >= max - 4 ? items.length - 1 : n;
+        dl.forEach((d, k) => d.classList.toggle("on", k === cur));
+        prev.disabled = track.scrollLeft <= 4;
+        next.disabled = track.scrollLeft >= max - 4;
+        rail.querySelector(".rail__ctrl").hidden = max <= 4;
+      };
+      prev.addEventListener("click", () => track.scrollBy({ left: -stepW(), behavior: reduce ? "auto" : "smooth" }));
+      next.addEventListener("click", () => track.scrollBy({ left: stepW(), behavior: reduce ? "auto" : "smooth" }));
+      track.addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
+      addEventListener("resize", update);
+      update();
+      // arrastar com o mouse no desktop
+      let down = false, x0 = 0, s0 = 0, moved = false;
+      track.addEventListener("pointerdown", (e) => { if (e.pointerType !== "mouse") return; down = true; moved = false; x0 = e.clientX; s0 = track.scrollLeft; track.style.scrollSnapType = "none"; });
+      addEventListener("pointermove", (e) => { if (!down) return; const dx = e.clientX - x0; if (Math.abs(dx) > 5) moved = true; track.scrollLeft = s0 - dx; });
+      addEventListener("pointerup", () => {
+        if (!down) return;
+        down = false;
+        const n = Math.round(track.scrollLeft / stepW());
+        track.style.scrollSnapType = "";
+        track.scrollTo({ left: n * stepW(), behavior: "smooth" });
+      });
+      track.addEventListener("click", (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+    });
+
+    // ---------- status aberto/fechado no fuso de SP ----------
     const spNow = () => {
       const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: "America/Sao_Paulo", weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date()).map((x) => [x.type, x.value]));
       return { d: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(p.weekday), m: +p.hour * 60 + +p.minute };
@@ -206,41 +175,10 @@
     status();
     setInterval(status, 60000);
 
-    // reinauguração: some sozinha depois da festa
-    const eventSec = $("#reinauguracao"), heroEvent = $("#hero-event");
-    if (eventSec && heroEvent) {
-    const count = () => {
-      const now = Date.now();
-      if (now > EVENT_END) { eventSec.hidden = true; heroEvent.hidden = true; return false; }
-      const diff = Math.max(0, EVENT_START - now);
-      const u = { d: Math.floor(diff / 864e5), h: Math.floor(diff / 36e5) % 24, m: Math.floor(diff / 6e4) % 60, s: Math.floor(diff / 1e3) % 60 };
-      $$("#count b").forEach((b) => (b.textContent = String(u[b.dataset.u]).padStart(2, "0")));
-      $("#mini-count").textContent = diff ? (u.d ? `faltam ${u.d}d ${u.h}h` : `faltam ${u.h}h ${u.m}min`) : "é hoje!";
-      return true;
-    };
-    if (count()) setInterval(count, 1000);
-    }
-
-    // manifesto palavra por palavra
-    const words = $("#words");
-    const wrap = (node) => [...node.childNodes].forEach((n) => {
-      if (n.nodeType === 3) {
-        const frag = document.createDocumentFragment();
-        n.textContent.split(/(\s+)/).forEach((w) => {
-          if (!w.trim()) return frag.append(w);
-          const s = document.createElement("span"); s.className = "w"; s.textContent = w; frag.append(s);
-        });
-        n.replaceWith(frag);
-      } else wrap(n);
-    });
-    wrap(words);
-    const ws = $$(".w", words);
-
-    // reserva
+    // ---------- reserva montada → WhatsApp ----------
     const form = $("#rform"), dayBox = $("#chips-d");
-    const { d: today } = spNow();
+    const { d: today, m: nowM } = spNow();
     const opts = [];
-    const { m: nowM } = spNow();
     for (let i = 0; opts.length < 5 && i < 8; i++) {
       const d = (today + i) % 7;
       if (!HOURS[d]) continue;
@@ -261,74 +199,64 @@
       e.preventDefault();
       open(`https://wa.me/${WA}?text=${encodeURIComponent(msg())}`, "_blank", "noopener");
     });
-    $$(".ritual").forEach((c) => $(".ritual__cta", c).addEventListener("click", () => {
+    $$("#massagens .card").forEach((c) => $(".pill", c).addEventListener("click", () => {
       const r = $(`input[name="m"][value="${c.dataset.massagem}"]`, form);
       if (r) { r.checked = true; preview(); }
-      goTo($("#reserva"));
+      $("#reserva").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
     }));
 
-    // trabalhe conosco: ficha vira mensagem no WhatsApp (nada é guardado)
+    // ---------- trabalhe conosco → WhatsApp ----------
     const tform = $("#tform"), terr = $("#terr");
-    if (tform) {
-      const idade = (iso) => {
-        const [y, m, d] = iso.split("-").map(Number);
-        const n = new Date(), a = n.getFullYear() - y;
-        return n.getMonth() + 1 > m || (n.getMonth() + 1 === m && n.getDate() >= d) ? a : a - 1;
-      };
-      const erro = (txt, campo) => {
-        terr.textContent = txt; terr.hidden = false;
-        if (campo) { campo.setAttribute("aria-invalid", "true"); campo.focus(); }
-      };
-      tform.addEventListener("input", (e) => { e.target.removeAttribute("aria-invalid"); terr.hidden = true; });
-      tform.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const f = new FormData(tform), el = (n) => tform.elements[n];
-        const nome = (f.get("nome") || "").trim().replace(/\s+/g, " ");
-        const tel = (f.get("tel") || "").replace(/\D/g, "");
-        const cidade = (f.get("cidade") || "").trim();
-        const nasc = f.get("nasc") || "";
-        if (nome.split(" ").length < 2) return erro("Escreva seu nome completo, com sobrenome.", el("nome"));
-        if (!nasc) return erro("Informe sua data de nascimento.", el("nasc"));
-        const anos = idade(nasc);
-        if (!(anos >= 18 && anos < 100)) return erro("A vaga é só para maiores de 18 anos.", el("nasc"));
-        if (tel.length < 10 || tel.length > 13) return erro("Confira o número do WhatsApp, com DDD.", el("tel"));
-        if (!cidade) return erro("Informe sua cidade ou bairro.", el("cidade"));
-        const foto = el("foto").files[0];
-        if (!foto) return erro("Escolha uma foto de corpo inteiro para enviar.", el("foto"));
-        if (!foto.type.startsWith("image/")) return erro("A foto precisa ser uma imagem (JPG ou PNG).", el("foto"));
-        if (!f.get("ok")) return erro("Confirme que tem 18 anos ou mais para enviar.", el("ok"));
-        const disp = f.getAll("disp");
-        const insta = (f.get("insta") || "").trim();
-        const sobre = (f.get("sobre") || "").trim();
-        const linhas = [
-          "Olá! Quero trabalhar no Club 57 como modelo.",
-          "",
-          `Nome completo: ${nome}`,
-          `Idade: ${anos} anos`,
-          `WhatsApp: ${f.get("tel").trim()}`,
-          `Cidade/bairro: ${cidade}`,
-          `Experiência: ${f.get("exp")}`,
-          `Disponibilidade: ${disp.length ? disp.join(", ") : "a combinar"}`,
-        ];
-        if (insta) linhas.push(`Instagram: ${insta}`);
-        if (sobre) linhas.push(`Sobre mim: ${sobre}`);
-        linhas.push("", "Vim pela página Trabalhe conosco · Modelos do site.");
-        const texto = linhas.join("\n");
-        const abrirWhats = (extra) => open(`https://wa.me/${WA}?text=${encodeURIComponent(texto + (extra || ""))}`, "_blank", "noopener");
-        const nota = $("#tnote");
-        if (navigator.canShare && navigator.canShare({ files: [foto] })) {
-          navigator.share({ files: [foto], text: texto }).catch(() => {
-            abrirWhats("\n\nVou enviar minha foto de corpo inteiro aqui na conversa.");
-          });
-          if (nota) nota.textContent = "Escolha o WhatsApp do Club 57 na lista para enviar a ficha com a foto.";
-        } else {
-          abrirWhats("\n\nVou enviar minha foto de corpo inteiro aqui na conversa.");
-          if (nota) nota.textContent = "Abrimos o WhatsApp com a sua ficha. Anexe a foto de corpo inteiro na conversa antes de enviar.";
-        }
-      });
-    }
+    const idade = (iso) => {
+      const [y, m, d] = iso.split("-").map(Number);
+      const n = new Date(), a = n.getFullYear() - y;
+      return n.getMonth() + 1 > m || (n.getMonth() + 1 === m && n.getDate() >= d) ? a : a - 1;
+    };
+    const erro = (txt, campo) => {
+      terr.textContent = txt; terr.hidden = false;
+      if (campo) { campo.setAttribute("aria-invalid", "true"); campo.focus(); }
+    };
+    tform.addEventListener("input", (e) => { e.target.removeAttribute("aria-invalid"); terr.hidden = true; });
+    tform.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const f = new FormData(tform), el = (n) => tform.elements[n];
+      const nome = (f.get("nome") || "").trim().replace(/\s+/g, " ");
+      const tel = (f.get("tel") || "").replace(/\D/g, "");
+      const cidade = (f.get("cidade") || "").trim();
+      const nasc = f.get("nasc") || "";
+      if (nome.split(" ").length < 2) return erro("Escreva seu nome completo, com sobrenome.", el("nome"));
+      if (!nasc) return erro("Informe sua data de nascimento.", el("nasc"));
+      const anos = idade(nasc);
+      if (!(anos >= 18 && anos < 100)) return erro("A vaga é só para maiores de 18 anos.", el("nasc"));
+      if (tel.length < 10 || tel.length > 13) return erro("Confira o número do WhatsApp, com DDD.", el("tel"));
+      if (!cidade) return erro("Informe sua cidade ou bairro.", el("cidade"));
+      const foto = el("foto").files[0];
+      if (!foto) return erro("Escolha uma foto de corpo inteiro para enviar.", el("foto"));
+      if (!foto.type.startsWith("image/")) return erro("A foto precisa ser uma imagem (JPG ou PNG).", el("foto"));
+      if (!f.get("ok")) return erro("Confirme que tem 18 anos ou mais para enviar.", el("ok"));
+      const disp = f.getAll("disp"), insta = (f.get("insta") || "").trim(), sobre = (f.get("sobre") || "").trim();
+      const linhas = [
+        "Olá! Quero trabalhar no Club 57 como modelo.", "",
+        `Nome completo: ${nome}`, `Idade: ${anos} anos`, `WhatsApp: ${f.get("tel").trim()}`, `Cidade/bairro: ${cidade}`,
+        `Experiência: ${f.get("exp")}`, `Disponibilidade: ${disp.length ? disp.join(", ") : "a combinar"}`,
+      ];
+      if (insta) linhas.push(`Instagram: ${insta}`);
+      if (sobre) linhas.push(`Sobre mim: ${sobre}`);
+      linhas.push("", "Vim pela página Trabalhe conosco · Modelos do site.");
+      const texto = linhas.join("\n");
+      const abrirWhats = (extra) => open(`https://wa.me/${WA}?text=${encodeURIComponent(texto + (extra || ""))}`, "_blank", "noopener");
+      const nota = $("#tnote");
+      // no celular a foto vai junto pelo compartilhamento; sem isso, abre o WhatsApp e pede pra anexar
+      if (navigator.canShare && navigator.canShare({ files: [foto] })) {
+        navigator.share({ files: [foto], text: texto }).catch(() => abrirWhats("\n\nVou enviar minha foto de corpo inteiro aqui na conversa."));
+        if (nota) nota.textContent = "Escolha o WhatsApp do Club 57 na lista para enviar a ficha com a foto.";
+      } else {
+        abrirWhats("\n\nVou enviar minha foto de corpo inteiro aqui na conversa.");
+        if (nota) nota.textContent = "Abrimos o WhatsApp com a sua ficha. Anexe a foto de corpo inteiro na conversa antes de enviar.";
+      }
+    });
 
-    // mapa só carrega quando pedem
+    // ---------- mapa só sob demanda ----------
     $("#map-load").addEventListener("click", () => {
       const f = document.createElement("iframe");
       f.src = "https://www.google.com/maps?q=Alameda+dos+Aic%C3%A1s,+1293+-+Moema,+S%C3%A3o+Paulo+-+SP,+04086-003&output=embed";
@@ -338,17 +266,16 @@
       $("#map").replaceChildren(f);
     });
 
-    // lightbox
+    // ---------- lightbox ----------
     const lb = $("#lightbox"), lbImg = $("#lb-img");
     let lastFocus = null;
-    const closeLb = () => { lb.hidden = true; document.body.classList.remove("is-locked"); lenis && lenis.start(); lastFocus && lastFocus.focus(); };
+    const closeLb = () => { lb.hidden = true; lock(false); lastFocus && lastFocus.focus(); };
     $$("#gallery button").forEach((b) => b.addEventListener("click", () => {
       const img = $("img", b);
       lastFocus = b;
       lbImg.src = img.src; lbImg.alt = img.alt;
       lb.hidden = false;
-      document.body.classList.add("is-locked");
-      lenis && lenis.stop();
+      lock(true);
       $("#lb-close").focus();
     }));
     $("#lb-close").addEventListener("click", closeLb);
@@ -356,182 +283,5 @@
     addEventListener("keydown", (e) => { if (e.key === "Escape" && !lb.hidden) closeLb(); });
 
     $("#year").textContent = new Date().getFullYear();
-    if (ok) unlock();
-
-    // cursor dourado, botões magnéticos e inclinações (só mouse)
-    if (matchMedia("(pointer: fine)").matches && !reduce) {
-      document.documentElement.classList.add("has-cursor");
-      const cur = $("#cursor"), dot = $("i", cur), ring = $("span", cur);
-      let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my, running = false;
-      // o anel só anima enquanto ainda está alcançando o ponteiro
-      const loop = () => {
-        rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
-        ring.style.transform = `translate(${rx}px,${ry}px)`;
-        if (Math.abs(mx - rx) + Math.abs(my - ry) > 0.3) requestAnimationFrame(loop);
-        else running = false;
-      };
-      addEventListener("pointermove", (e) => {
-        mx = e.clientX; my = e.clientY;
-        dot.style.transform = `translate(${mx}px,${my}px)`;
-        if (!running) { running = true; requestAnimationFrame(loop); }
-      }, { passive: true });
-      document.addEventListener("pointerover", (e) => cur.classList.toggle("is-hover", !!e.target.closest("a,button,label,summary")));
-      $$("[data-magnet]").forEach((b) => {
-        b.addEventListener("pointermove", (e) => {
-          const r = b.getBoundingClientRect();
-          b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.25}px,${(e.clientY - r.top - r.height / 2) * 0.35}px)`;
-        });
-        b.addEventListener("pointerleave", () => (b.style.transform = ""));
-      });
-      const logo = $(".hero__logo");
-      heroMove.push((x, y) => {
-        logo.style.setProperty("--ry", `${(x / innerWidth - 0.5) * 18}deg`);
-        logo.style.setProperty("--rx", `${(0.5 - y / innerHeight) * 14}deg`);
-      });
-      const poster = $(".event__poster");
-      if (poster) poster.addEventListener("pointermove", (e) => {
-        const r = poster.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-        poster.style.setProperty("--py", `${(x - 0.5) * 14}deg`);
-        poster.style.setProperty("--px", `${(0.5 - y) * 10}deg`);
-        poster.style.setProperty("--gx2", `${x * 100}%`);
-        poster.style.setProperty("--gy2", `${y * 100}%`);
-      });
-      if (poster) poster.addEventListener("pointerleave", () => ["--px", "--py"].forEach((p) => poster.style.setProperty(p, "0deg")));
-    }
-
-    // sem GSAP ou com movimento reduzido: tudo aparece de uma vez
-    const still = () => {
-      portalPhoto();
-      ws.forEach((w) => w.classList.add("on"));
-      $$(".reveal").forEach((el) => el.classList.add("is-in"));
-      $(".portal__photo").style.opacity = 1;
-      $(".portal__cap").style.opacity = 1;
-      $("#rituals").classList.add("no-pin");
-    };
-
-    const motion = () => {
-      hasGsap = true;
-      gsap.registerPlugin(ScrollTrigger);
-      ScrollTrigger.config({ ignoreMobileResize: true });
-      if (!document.body.classList.contains("is-locked")) smooth();
-
-      // reveal simples
-      $$(".reveal").forEach((el) => ScrollTrigger.create({ trigger: el, start: "top 88%", once: true, onEnter: () => el.classList.add("is-in") }));
-
-      // hero afunda na rolagem
-      gsap.to(".hero__bg", { yPercent: 18, scale: 1.08, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
-      gsap.to("#hero-inner", { yPercent: -25, opacity: 0, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
-
-      // portal: entra pelo 57 até o salão
-      const pt = gsap.timeline({ scrollTrigger: { trigger: ".portal", start: "top top", end: "bottom bottom", scrub: 0.6 } });
-      // escala máxima 9 (era 22): o 57 gigante virava uma camada de milhares de pixels que o
-      // celular descartava, e ao subir a página o número piscava ou aparecia como um bloco
-      pt.fromTo(".portal__num", { scale: 0.7 }, { scale: 1, duration: 0.25, ease: "none" })
-        .to(".portal__num", { scale: 9, duration: 0.55, ease: "power2.in" })
-        .to(".portal__photo", { opacity: 1, duration: 0.25, ease: "none" }, "-=0.3")
-        .to(".portal__num", { opacity: 0, duration: 0.1 }, "-=0.12")
-        .to(".portal__cap", { opacity: 1, y: -10, duration: 0.2 });
-
-      // manifesto acende palavra por palavra
-      ScrollTrigger.create({
-        trigger: words, start: "top 80%", end: "bottom 45%", scrub: true,
-        onUpdate: (st) => { const n = Math.round(st.progress * ws.length); ws.forEach((w, i) => w.classList.toggle("on", i < n)); },
-      });
-      gsap.from(".manifesto__stats li", { y: 40, opacity: 0, stagger: 0.12, duration: 1, ease: "expo.out", scrollTrigger: { trigger: ".manifesto__stats", start: "top 88%" } });
-
-      // cartaz e cards (clearProps devolve a inclinação do cartaz pro CSS)
-      gsap.from(".event__poster img", { y: 90, rotate: -8, opacity: 0, duration: 1.4, ease: "expo.out", clearProps: "transform,opacity", scrollTrigger: { trigger: ".event", start: "top 75%" } });
-      gsap.from(".bar__a", { clipPath: "inset(100% 0 0 0)", duration: 1.5, ease: "expo.inOut", clearProps: "clipPath", scrollTrigger: { trigger: ".bar", start: "top 75%" } });
-      gsap.from(".bar__b", { clipPath: "inset(0 0 0 100%)", duration: 1.5, delay: 0.2, ease: "expo.inOut", clearProps: "clipPath", scrollTrigger: { trigger: ".bar", start: "top 75%" } });
-      gsap.to(".final__media", { yPercent: 12, ease: "none", scrollTrigger: { trigger: ".final", scrub: true } });
-      gsap.from(".final__big", { scale: 0.85, opacity: 0, ease: "none", scrollTrigger: { trigger: ".final", start: "top 80%", end: "center center", scrub: true } });
-
-      // ambientes: rolagem horizontal (desktop). A tela fica presa por CSS sticky, sem pin de JS:
-      // a seção ganha a altura do percurso e o trilho só anda conforme o progresso
-      gsap.matchMedia().add("(min-width: 761px)", () => {
-        const amb = $(".amb"), pin = $(".amb__pin"), track = $("#gallery");
-        if (amb.classList.contains("amb--duo")) return;
-        const dist = () => Math.max(0, track.scrollWidth - (innerWidth - parseFloat(getComputedStyle(pin).paddingLeft)) + 40);
-        const setH = () => { amb.style.height = `${dist() + innerHeight}px`; };
-        setH();
-        ScrollTrigger.addEventListener("refreshInit", setH);
-        const tween = gsap.to(track, {
-          x: () => -dist(), ease: "none",
-          scrollTrigger: { trigger: amb, start: "top top", end: "bottom bottom", scrub: 0.5, invalidateOnRefresh: true },
-        });
-        $$(".amb__card img").forEach((img) => gsap.fromTo(img, { xPercent: -6 }, { xPercent: 6, ease: "none", scrollTrigger: { trigger: img.parentNode, containerAnimation: tween, start: "left right", end: "right left", scrub: true } }));
-        return () => { ScrollTrigger.removeEventListener("refreshInit", setH); amb.style.height = ""; };
-      });
-
-      // rituais: tela presa por CSS sticky e uma linha do tempo ligada à rolagem decide qual aparece.
-      // Como tudo é função da posição, subir a página desfaz exatamente o que a descida fez
-      const rits = $$(".ritual"), navLi = $$(".rituals__nav li");
-      const glows = ["rgba(226,170,90,.38)", "rgba(205,120,50,.38)", "rgba(160,40,70,.42)", "rgba(190,30,45,.45)", "rgba(240,205,130,.34)"];
-      const pinEl = $(".rituals__pin"), ritBar = $("#rit-bar"), ritN = $("#rit-n");
-      const ritPh = $$(".rituals__photos img");
-      rits.forEach((r) => r.classList.add("is-on"));
-      gsap.set(rits, { autoAlpha: 0 });
-      gsap.set(rits[0], { autoAlpha: 1 });
-      const rt = gsap.timeline({ defaults: { ease: "power2.out" } });
-      rits.forEach((r, i) => {
-        if (i) rt.fromTo(r, { autoAlpha: 0, y: 70 }, { autoAlpha: 1, y: 0, duration: 0.3, immediateRender: false }, i);
-        if (i < rits.length - 1) rt.to(r, { autoAlpha: 0, y: -70, duration: 0.3, ease: "power2.in" }, i + 0.7);
-      });
-      rt.set({}, {}, rits.length);
-      let ri = -1;
-      const mark = (n) => {
-        if (n === ri) return;
-        ri = n;
-        navLi.forEach((l, i) => l.classList.toggle("is-on", i === n));
-        ritN.textContent = String(n + 1).padStart(2, "0");
-        pinEl.style.setProperty("--rg", glows[n]);
-        ritPh.forEach((p, i) => p.classList.toggle("is-on", i === n));
-      };
-      mark(0);
-      ScrollTrigger.create({
-        trigger: "#rituals", start: "top top", end: "bottom bottom", animation: rt, scrub: 0.4,
-        onUpdate: (st) => {
-          ritBar.style.transform = `scaleX(${0.2 + st.progress * 0.8})`;
-          mark(Math.min(rits.length - 1, Math.floor(st.progress * rits.length)));
-        },
-      });
-
-      // faixa gigante: corre sozinha e acelera com a rolagem, depois volta ao normal
-      const big = gsap.to("#big-track", { xPercent: -50, duration: 26, ease: "none", repeat: -1 });
-      let calm = 0;
-      ScrollTrigger.create({
-        trigger: ".big", start: "top bottom", end: "bottom top",
-        onToggle: (st) => (st.isActive ? big.play() : big.pause()),
-        onUpdate: (st) => {
-          const v = Math.max(1, Math.min(5, Math.abs(st.getVelocity()) / 300));
-          gsap.to(big, { timeScale: v * (st.direction || 1), duration: 0.25, overwrite: true });
-          clearTimeout(calm);
-          calm = setTimeout(() => gsap.to(big, { timeScale: 1, duration: 1, overwrite: true }), 160);
-        },
-      });
-
-      ScrollTrigger.refresh();
-    };
-
-    // GSAP, ScrollTrigger e Lenis chegam por scripts assíncronos
-    if (reduce) return still();
-    const load = (src) => new Promise((res, rej) => {
-      const s = document.createElement("script");
-      s.src = src; s.onload = res; s.onerror = rej;
-      document.head.append(s);
-    });
-    let booted = false;
-    const boot = () => {
-      if (booted) return;
-      booted = true;
-      portalPhoto();
-      load("js/gsap.min.js")
-        .then(() => Promise.all([load("js/ScrollTrigger.min.js"), load("js/lenis.min.js")]))
-        .then(motion)
-        .catch(still);
-    };
-    // carrega já (os scripts são assíncronos e não seguram o primeiro paint). Esperar o idle ou o
-    // primeiro toque fazia a galeria ganhar altura no meio da rolagem e a página dava um salto
-    boot();
   });
 })();
