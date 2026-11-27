@@ -404,7 +404,47 @@ legend { padding: 0; margin-bottom: 10px; font: 700 12px/1 var(--f); letter-spac
 
 /* ---------- tema branco: fundo branco, texto preto, dourado do logo como único destaque ---------- */
 :root { --bg: #ffffff; --ink: #141210; --muted: #6f6a64; --line: rgba(20, 18, 16, .09); --dark: #141210; --soft: #f6f4f0; --gold: #b8873a; --gold-2: #d9b264; --wine: #b8873a; --wine-2: #d9b264; color-scheme: light; }
-.orbs { display: none; }
+.orbs { display: block; }
+.orbs i { opacity: .8; }
+.o1 { --c: #f0cf8a; } .o2 { --c: #f3c9bd; } .o3 { --c: #e8c27a; } .o4 { --c: #efd9b4; }
+.o5 { --c: #f6deb0; } .o6 { --c: #ecc2b3; } .o7 { --c: #e5bd6e; }
+/* brilho dourado que segue o mouse (desktop) */
+.glow { position: fixed; z-index: 0; left: 0; top: 0; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(232, 194, 122, .5) 0%, rgba(232, 194, 122, .16) 35%, transparent 65%);
+  transform: translate3d(var(--mx, -999px), var(--my, -999px), 0); transition: opacity .6s; opacity: 0; will-change: transform; }
+.glow.on { opacity: 1; }
+@media (pointer: coarse), (max-width: 760px) { .glow { display: none; } }
+/* pó dourado subindo devagar */
+.dust { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.dust i { position: absolute; bottom: -10px; width: var(--d); height: var(--d); border-radius: 50%; background: #d4a24c; box-shadow: 0 0 6px rgba(212, 162, 76, .6); opacity: 0;
+  animation: rise var(--t) linear infinite; animation-delay: var(--w); left: var(--x); }
+.dust i:nth-child(1) { --x:6.1%; --d:3px; --t:16.7s; --w:-8.4s; --dx:-3px; }
+.dust i:nth-child(2) { --x:96.5%; --d:6px; --t:21.6s; --w:-23.0s; --dx:-58px; }
+.dust i:nth-child(3) { --x:72.6%; --d:5px; --t:18.5s; --w:-25.4s; --dx:19px; }
+.dust i:nth-child(4) { --x:71.7%; --d:6px; --t:20.6s; --w:-21.1s; --dx:14px; }
+.dust i:nth-child(5) { --x:56.3%; --d:4px; --t:18.6s; --w:-25.8s; --dx:38px; }
+.dust i:nth-child(6) { --x:91.7%; --d:4px; --t:21.1s; --w:-9.5s; --dx:2px; }
+.dust i:nth-child(7) { --x:23.1%; --d:5px; --t:18.7s; --w:-5.7s; --dx:-6px; }
+.dust i:nth-child(8) { --x:63.3%; --d:6px; --t:14.2s; --w:-10.1s; --dx:14px; }
+.dust i:nth-child(9) { --x:44.1%; --d:3px; --t:22.5s; --w:-14.2s; --dx:-57px; }
+.dust i:nth-child(10) { --x:2.0%; --d:5px; --t:18.2s; --w:-9.6s; --dx:11px; }
+.dust i:nth-child(11) { --x:27.4%; --d:6px; --t:22.1s; --w:-3.6s; --dx:20px; }
+.dust i:nth-child(12) { --x:43.9%; --d:4px; --t:14.0s; --w:-18.4s; --dx:-30px; }
+.dust i:nth-child(13) { --x:56.2%; --d:3px; --t:22.7s; --w:-25.2s; --dx:-55px; }
+.dust i:nth-child(14) { --x:32.3%; --d:4px; --t:24.1s; --w:-6.4s; --dx:44px; }
+.dust i:nth-child(15) { --x:6.0%; --d:4px; --t:14.3s; --w:-4.1s; --dx:26px; }
+.dust i:nth-child(16) { --x:44.9%; --d:4px; --t:25.3s; --w:-11.6s; --dx:4px; }
+.dust i:nth-child(17) { --x:38.3%; --d:4px; --t:21.2s; --w:-13.0s; --dx:41px; }
+.dust i:nth-child(18) { --x:24.7%; --d:6px; --t:15.6s; --w:-2.8s; --dx:58px; }
+.dust i:nth-child(19) { --x:24.4%; --d:4px; --t:14.4s; --w:-0.7s; --dx:40px; }
+.dust i:nth-child(20) { --x:44.7%; --d:3px; --t:14.3s; --w:-22.1s; --dx:30px; }
+.dust i:nth-child(21) { --x:63.3%; --d:4px; --t:18.2s; --w:-8.3s; --dx:-13px; }
+.dust i:nth-child(22) { --x:55.2%; --d:4px; --t:18.6s; --w:-8.9s; --dx:29px; }
+.dust i:nth-child(23) { --x:21.6%; --d:3px; --t:25.6s; --w:-23.0s; --dx:2px; }
+.dust i:nth-child(24) { --x:13.7%; --d:3px; --t:21.9s; --w:-10.4s; --dx:-50px; }
+.dust i:nth-child(25) { --x:70.0%; --d:3px; --t:14.1s; --w:-16.6s; --dx:47px; }
+.dust i:nth-child(26) { --x:65.7%; --d:4px; --t:22.7s; --w:-16.4s; --dx:-59px; }
+@keyframes rise { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 12% { opacity: .55; } 85% { opacity: .35; } 100% { transform: translate3d(var(--dx), -105vh, 0); opacity: 0; } }
 body { background: #fff; }
 .pill--dark, .pill--light { background: var(--ink); color: #fff; }
 .pill--soft { background: var(--soft); color: var(--ink); }
@@ -494,6 +534,7 @@ legend { color: var(--muted); }
   .o1 { --s: 220px; } .o2 { --s: 180px; } .o3 { --s: 200px; } .o4, .o7 { --s: 160px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .dust, .glow { display: none; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
   .js .rv { opacity: 1; transform: none; }

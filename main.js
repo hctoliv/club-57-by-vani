@@ -283,5 +283,23 @@
     addEventListener("keydown", (e) => { if (e.key === "Escape" && !lb.hidden) closeLb(); });
 
     $("#year").textContent = new Date().getFullYear();
+
+    // brilho dourado seguindo o mouse
+    const glow = $("#glow");
+    if (glow && !reduce && matchMedia("(pointer: fine)").matches) {
+      let gx = 0, gy = 0, tx = 0, ty = 0, run = false;
+      const loop = () => {
+        gx += (tx - gx) * 0.12; gy += (ty - gy) * 0.12;
+        glow.style.setProperty("--mx", gx.toFixed(1) + "px");
+        glow.style.setProperty("--my", gy.toFixed(1) + "px");
+        if (Math.abs(tx - gx) + Math.abs(ty - gy) > 0.5) requestAnimationFrame(loop); else run = false;
+      };
+      addEventListener("pointermove", (e) => {
+        tx = e.clientX; ty = e.clientY;
+        if (!glow.classList.contains("on")) { gx = tx; gy = ty; glow.classList.add("on"); }
+        if (!run) { run = true; requestAnimationFrame(loop); }
+      }, { passive: true });
+      document.addEventListener("pointerleave", () => glow.classList.remove("on"));
+    }
   });
 })();
