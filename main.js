@@ -91,13 +91,13 @@
     // hero: fotos entram depois do primeiro paint
     const slides = $$(".hero__slide");
     const loadSlide = (el) => { if (!el.dataset.on) { el.style.backgroundImage = `url(${el.dataset.src})`; el.dataset.on = 1; } };
-    loadSlide(slides[0]);
+    if (slides.length) loadSlide(slides[0]);
     addEventListener("load", () => slides.forEach(loadSlide));
     let cur = 0, heroOn = true;
     const hero = $(".hero");
     // fora da tela o hero para: sem troca de foto e sem animação CSS rodando à toa
     new IntersectionObserver(([e]) => { heroOn = e.isIntersecting; hero.classList.toggle("is-off", !heroOn); }).observe(hero);
-    if (!reduce) {
+    if (!reduce && slides.length > 1) {
       setInterval(() => {
         if (!heroOn || document.hidden) return;
         slides[cur].classList.remove("is-on");
@@ -466,7 +466,7 @@
       // rituais: tela presa por CSS sticky e uma linha do tempo ligada à rolagem decide qual aparece.
       // Como tudo é função da posição, subir a página desfaz exatamente o que a descida fez
       const rits = $$(".ritual"), navLi = $$(".rituals__nav li");
-      const glows = ["rgba(200,20,60,.40)", "rgba(226,150,80,.30)", "rgba(150,20,90,.42)", "rgba(210,16,46,.48)", "rgba(120,24,110,.40)"];
+      const glows = ["rgba(200,150,110,.30)", "rgba(180,120,80,.30)", "rgba(160,90,80,.34)", "rgba(190,110,90,.36)", "rgba(220,170,120,.30)"];
       const pinEl = $(".rituals__pin"), ritBar = $("#rit-bar"), ritN = $("#rit-n");
       const ritPh = $$(".rituals__photos img");
       rits.forEach((r) => r.classList.add("is-on"));
