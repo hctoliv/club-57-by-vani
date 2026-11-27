@@ -466,7 +466,7 @@
       // rituais: tela presa por CSS sticky e uma linha do tempo ligada à rolagem decide qual aparece.
       // Como tudo é função da posição, subir a página desfaz exatamente o que a descida fez
       const rits = $$(".ritual"), navLi = $$(".rituals__nav li");
-      const glows = ["rgba(226,170,90,.38)", "rgba(205,120,50,.38)", "rgba(160,40,70,.42)", "rgba(190,30,45,.45)", "rgba(240,205,130,.34)"];
+      const glows = ["rgba(200,20,60,.40)", "rgba(226,150,80,.30)", "rgba(150,20,90,.42)", "rgba(210,16,46,.48)", "rgba(120,24,110,.40)"];
       const pinEl = $(".rituals__pin"), ritBar = $("#rit-bar"), ritN = $("#rit-n");
       const ritPh = $$(".rituals__photos img");
       rits.forEach((r) => r.classList.add("is-on"));
