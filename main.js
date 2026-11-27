@@ -468,6 +468,7 @@
       const rits = $$(".ritual"), navLi = $$(".rituals__nav li");
       const glows = ["rgba(226,170,90,.38)", "rgba(205,120,50,.38)", "rgba(160,40,70,.42)", "rgba(190,30,45,.45)", "rgba(240,205,130,.34)"];
       const pinEl = $(".rituals__pin"), ritBar = $("#rit-bar"), ritN = $("#rit-n");
+      const ritPh = $$(".rituals__photos img");
       rits.forEach((r) => r.classList.add("is-on"));
       gsap.set(rits, { autoAlpha: 0 });
       gsap.set(rits[0], { autoAlpha: 1 });
@@ -484,6 +485,7 @@
         navLi.forEach((l, i) => l.classList.toggle("is-on", i === n));
         ritN.textContent = String(n + 1).padStart(2, "0");
         pinEl.style.setProperty("--rg", glows[n]);
+        ritPh.forEach((p, i) => p.classList.toggle("is-on", i === n));
       };
       mark(0);
       ScrollTrigger.create({
