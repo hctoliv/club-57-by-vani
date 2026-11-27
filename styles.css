@@ -902,3 +902,79 @@ body{background:var(--ink)}
 .cursor.is-hover span{background:rgba(196,154,120,.14)}
 .intro{background:var(--ink)}
 .gate{background:radial-gradient(ellipse at center,#2e2922,#141310 72%)}
+
+/* ===== v5 abertura: pedras quentes, vapor e linhas de óleo ===== */
+.hero{padding:120px var(--pad) 150px;place-items:stretch}
+.hero::before{background:linear-gradient(to bottom,rgba(28,27,23,.2),transparent 30%,transparent 75%,var(--ink))}
+.hero__bg{background:radial-gradient(ellipse 70% 80% at 72% 45%,#3b3228 0%,#28241e 40%,#1c1b17 75%)}
+.hero__orb{right:8%;top:14%;width:min(52vw,720px);opacity:.75}
+.hero__beam{left:58%;opacity:.8}
+.hero__grid{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:clamp(24px,4vw,64px);align-items:center;max-width:1360px}
+.hero__kicker{font-size:12px;letter-spacing:.32em;color:var(--gold)}
+.hero__display{font:400 clamp(60px,8.6vw,138px)/.88 var(--serif);letter-spacing:-.035em;color:var(--text)}
+.hero__display em{font-style:italic;font-weight:600;color:var(--gold-2)}
+.hero__sub{font-size:clamp(16px,1.25vw,18px);max-width:44ch;color:var(--muted)}
+.status{margin-bottom:26px}
+
+/* composição */
+.hero__art{position:relative;aspect-ratio:1;width:min(100%,600px);justify-self:center;display:grid;place-items:center;font-size:clamp(7px,.95vw,14px);transform:perspective(1200px) rotateX(calc(var(--rx,0deg) * .35)) rotateY(calc(var(--ry,0deg) * .35));transition:transform .8s var(--ease);animation:rise 1.6s var(--ease) .2s both}
+.hero__halo{position:absolute;inset:8%;border-radius:50%;background:radial-gradient(circle at 50% 55%,rgba(240,200,160,.28),rgba(168,130,106,.12) 45%,transparent 70%)}
+.hero__ring{position:absolute;inset:4%;border-radius:50%;border:1px solid rgba(230,199,166,.28)}
+.hero__ring::after{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:var(--gold-2);top:50%;left:-5px;box-shadow:0 0 18px 4px rgba(230,199,166,.5);transform-origin:calc(min(600px,92vw) * .46 + 5px) 50%;animation:orbit 22s linear infinite}
+@keyframes orbit{to{rotate:360deg}}
+.hero__flow{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.hero__flow path{stroke:rgba(230,199,166,.38);stroke-width:1.2;stroke-linecap:round;stroke-dasharray:6 14;animation:flow 14s linear infinite}
+.hero__flow path:nth-child(2){stroke:rgba(230,199,166,.24);animation-duration:18s}
+.hero__flow path:nth-child(3){stroke:rgba(230,199,166,.14);animation-duration:22s}
+@keyframes flow{to{stroke-dashoffset:-400}}
+
+/* pedras empilhadas */
+.stones{position:relative;z-index:2;display:flex;flex-direction:column-reverse;align-items:center;margin-top:8em;animation:stonesFloat 7s ease-in-out infinite}
+.stones i{display:block;border-radius:50%;background:radial-gradient(ellipse 60% 70% at 38% 28%,#7d7168 0%,#4b433c 32%,#2c2723 68%,#1a1714 100%);box-shadow:inset 0 .5em 1.1em rgba(255,226,190,.16),inset 0 -.9em 1.4em rgba(0,0,0,.55),0 1.3em 2em -1em rgba(0,0,0,.85)}
+.stones i:nth-child(1){width:30em;height:7.6em}
+.stones i:nth-child(2){width:24.5em;height:6.6em;margin-bottom:-1.5em}
+.stones i:nth-child(3){width:19em;height:5.6em;margin-bottom:-1.35em}
+.stones i:nth-child(4){width:13.5em;height:4.6em;margin-bottom:-1.2em;background:radial-gradient(ellipse 60% 70% at 38% 28%,#a5896f 0%,#6d5643 34%,#3a2f26 70%,#1f1a15 100%)}
+.stones i:nth-child(4)::after{content:"";position:absolute}
+@keyframes stonesFloat{50%{transform:translateY(-.6em)}}
+.stones__shadow{position:absolute;z-index:1;left:50%;top:calc(50% + 12.2em);width:34em;height:3em;translate:-50% 0;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.6),transparent 70%);filter:blur(6px)}
+
+/* gota de óleo que cai e espalha */
+.drop{position:absolute;z-index:3;left:50%;top:10%;width:1.4em;height:1.9em;margin-left:-.7em;border-radius:50% 50% 50% 50% / 62% 62% 38% 38%;background:radial-gradient(circle at 35% 35%,#fff1dc,#e6c7a6 35%,#a8826a 75%);box-shadow:0 0 1.2em rgba(230,199,166,.6);opacity:0;animation:drop 5s cubic-bezier(.55,0,.9,.5) 1.4s infinite}
+@keyframes drop{0%{transform:translateY(0) scale(.6);opacity:0}12%{opacity:1;transform:translateY(0) scale(1)}46%{transform:translateY(16.8em) scale(1,1.1);opacity:1}50%{transform:translateY(17.4em) scale(1.8,.3);opacity:0}100%{opacity:0;transform:translateY(17.4em)}}
+
+/* vapor */
+.steam{position:absolute;z-index:3;left:50%;top:22%;width:12em;height:14em;translate:-50% 0;pointer-events:none}
+.steam i{position:absolute;bottom:0;width:2.6em;height:9em;border-radius:50%;background:radial-gradient(ellipse at center,rgba(246,232,214,.32),transparent 70%);filter:blur(10px);opacity:0;animation:steam 6s ease-out infinite}
+.steam i:nth-child(1){left:2.5em}
+.steam i:nth-child(2){left:5em;animation-delay:2s}
+.steam i:nth-child(3){left:7.5em;animation-delay:4s}
+@keyframes steam{0%{transform:translateY(2em) scaleX(.7);opacity:0}25%{opacity:.9}100%{transform:translateY(-8em) translateX(1em) scaleX(1.4);opacity:0}}
+
+.hero__tag{position:absolute;z-index:3;left:50%;bottom:4%;translate:-50% 0;white-space:nowrap;font:500 11px/1 var(--sans);letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+
+/* barra de massagens no pé da abertura */
+.hero__menu{position:absolute;left:var(--pad);right:var(--pad);bottom:28px;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);animation:rise 1.4s var(--ease) .7s both}
+.hero__menu a{display:flex;align-items:baseline;gap:12px;padding:18px 4px 0;text-decoration:none;font:500 clamp(18px,1.6vw,24px)/1 var(--serif);color:var(--text);transition:color .3s}
+.hero__menu a+a{padding-left:clamp(14px,2vw,28px);border-left:1px solid var(--line)}
+.hero__menu span{font:500 11px/1 var(--sans);letter-spacing:.2em;color:var(--gold)}
+.hero__menu a:hover{color:var(--gold-2)}
+.hero__scroll{display:none}
+
+@media (max-width:860px){
+  .hero{padding:96px var(--pad) 120px}
+  .hero__grid{grid-template-columns:1fr;text-align:left;gap:8px}
+  .hero__art{order:1;width:min(88vw,420px);font-size:clamp(6px,1.9vw,9px);justify-self:center}
+  .hero__copy{order:2;align-items:flex-start}
+  .hero__actions{justify-content:flex-start}
+  .hero__display{font-size:clamp(52px,15vw,80px)}
+  .hero__orb{width:90vw;right:-20%;top:4%}
+  .hero__menu{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto;scrollbar-width:none;bottom:20px}
+  .hero__menu a{font-size:19px}
+  .hero__ring::after{display:none}
+}
+@media (max-width:560px){
+  .hero__tag{font-size:9px;letter-spacing:.22em}
+}
+.hero__kicker{max-width:none}
+@media (max-width:560px){.hero__kicker{font-size:10.5px;letter-spacing:.24em}}

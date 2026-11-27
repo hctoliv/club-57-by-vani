@@ -383,8 +383,8 @@
         });
         b.addEventListener("pointerleave", () => (b.style.transform = ""));
       });
-      const logo = $(".hero__logo");
-      heroMove.push((x, y) => {
+      const logo = $(".hero__art");
+      if (logo) heroMove.push((x, y) => {
         logo.style.setProperty("--ry", `${(x / innerWidth - 0.5) * 18}deg`);
         logo.style.setProperty("--rx", `${(0.5 - y / innerHeight) * 14}deg`);
       });
