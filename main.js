@@ -7,7 +7,8 @@
   const DAYS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // site calmo: sem intro, cursor, rolagem suave, parallax ou animações presas à rolagem
+  const reduce = true;
   const mobile = () => innerWidth <= 760;
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -134,7 +135,7 @@
     }, { rootMargin: "1200px 0px" }).observe($(".amb"));
 
     // foto do portal fica fora do carregamento inicial; entra junto com as animações
-    const portalPhoto = () => $(".portal").classList.add("is-near");
+    const portalPhoto = () => { const p = $(".portal"); if (p) p.classList.add("is-near"); };
 
     // faíscas douradas subindo no hero (sprite pré-desenhado, 30 fps, só com o hero na tela)
     const sparks = () => {
@@ -404,8 +405,6 @@
       portalPhoto();
       ws.forEach((w) => w.classList.add("on"));
       $$(".reveal").forEach((el) => el.classList.add("is-in"));
-      $(".portal__photo").style.opacity = 1;
-      $(".portal__cap").style.opacity = 1;
       $("#rituals").classList.add("no-pin");
     };
 

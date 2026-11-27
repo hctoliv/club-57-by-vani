@@ -978,3 +978,31 @@ body{background:var(--ink)}
 }
 .hero__kicker{max-width:none}
 @media (max-width:560px){.hero__kicker{font-size:10.5px;letter-spacing:.24em}}
+
+/* ===== v6 calmo: nada se mexe sozinho, só os efeitos de passar o mouse ===== */
+.hero__beam,.hero__orb,.hero__smoke i,.hero__candles i,.hero__streak,.hero__flow path,.stones,.orb,
+.status,.status.is-open .status__dot,.map__pin,.trab__glow,.hero__kicker,.hero__sub,.hero__actions,.hero__art,.hero__menu,
+.hero__display .ln>span,.h2 em,.final__big em,.ritual__name,.gate__box,.lightbox img{animation:none!important}
+.drop,.steam,.hero__ring::after,.hero__smoke,.hero__glow,.grain{display:none}
+.hero__art{transform:none;transition:none}
+.js .reveal{opacity:1;transform:none;transition:none}
+.js .manifesto__text .w{color:var(--text);transition:none}
+.js .manifesto__text em .w{color:var(--gold-2)}
+
+/* massagens: lista simples com linhas finas, sem prender a tela */
+.rituals.no-pin{margin:0}
+.no-pin .rituals__pin{padding:0;border:0;display:block;min-height:0}
+.no-pin .rituals__glow{display:none}
+.no-pin .rituals__stage{width:100%;max-width:1320px;margin:0 auto;justify-self:auto;text-align:left;display:block}
+.no-pin .ritual{display:grid;grid-template-columns:minmax(150px,.7fr) minmax(0,1.3fr) auto;align-items:center;gap:clamp(18px,3vw,48px);padding:clamp(26px,3vw,40px) 0;margin:0;border-top:1px solid var(--line);transform:none!important}
+.no-pin .ritual:last-child{border-bottom:1px solid var(--line)}
+.no-pin .ritual__n{grid-column:1;grid-row:1;align-self:start;margin-top:.9em}
+.no-pin .ritual__name{grid-column:1;grid-row:1;align-self:end;font-size:clamp(40px,4.6vw,66px);margin:2.2rem 0 0;padding:0}
+.no-pin .ritual__txt{grid-column:2;grid-row:1;max-width:52ch;text-shadow:none}
+.no-pin .ritual__cta{grid-column:3;grid-row:1;margin:0}
+.perks{margin-top:clamp(40px,5vw,64px)}
+@media (max-width:760px){
+  .no-pin .ritual{grid-template-columns:1fr;gap:12px}
+  .no-pin .ritual__n,.no-pin .ritual__name,.no-pin .ritual__txt,.no-pin .ritual__cta{grid-column:1;grid-row:auto;margin:0}
+  .no-pin .ritual__cta{justify-self:start;margin-top:8px}
+}
